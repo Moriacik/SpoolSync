@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725419336343",
+    "project_id": "spoolsync",
+    "storage_bucket": "spoolsync.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725419336343:android:e2b04888afb1109ebcffd2",
+        "android_client_info": {
+          "package_name": "com.example.spoolsync"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxoEpWihtYvrazyc094TWAjKDwOOWktH8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
