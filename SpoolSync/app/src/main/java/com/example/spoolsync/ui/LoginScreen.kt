@@ -23,6 +23,8 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val lightGrayColor = colorResource(R.color.light_gray)
     val darkGrayColor = colorResource(R.color.dark_gray)
+    val message1 = stringResource(R.string.error1)
+    val message2 = stringResource(R.string.error2)
 
     Column(
         modifier = Modifier
@@ -42,7 +44,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email", color = darkGrayColor) },
+            label = { Text(stringResource(R.string.email), color = darkGrayColor) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -59,7 +61,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Heslo", color = darkGrayColor) },
+            label = { Text(stringResource(R.string.password), color = darkGrayColor) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -85,15 +87,15 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
         Button(
             onClick = {
                 if (email.isBlank() || password.isBlank()) {
-                    errorMessage = "Vyplňte všetky polia"
+                    errorMessage = message1
                 } else {
                     isLoading = true
                     authViewModel.loginUser(email, password) { success, errorMsg ->
                         isLoading = false
                         if (!success) {
-                            errorMessage = errorMsg ?: "Neplatné prihlasovacie údaje"
+                            errorMessage = errorMsg ?: message2
                         } else {
-                            navController.navigate("home") {
+                            navController.navigate("filaments") {
                                 popUpTo("login") { inclusive = true }
                             }
                         }
@@ -112,16 +114,16 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White)
             } else {
-                Text("Prihlásiť sa")
+                Text(stringResource(R.string.login))
             }
         }
 
         TextButton(
-            onClick = { navController.navigate("register") },
+            onClick = { navController.navigate("register") }, // Fixed: Using direct string instead of stringResource
             modifier = Modifier.padding(top = 8.dp)
         ) {
             Text(
-                text = "Nemáte účet? Zaregistrujte sa",
+                text = stringResource(R.string.to_register),
                 color = lightGrayColor
             )
         }

@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">SpoolSync</string>
+    <string name="filaments">Filaments</string>
+    <string name="info">Info</string>
+    <string name="print">Print</string>
+
+    // Login/Register strings
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="re_password">Re enter the password</string>
+    <string name="error1">Not all fields are filled in.</string>
+    <string name="error2">Invalid login details.</string>
+    <string name="error3">The passwords do not match.</string>
+    <string name="error4">Password must be at least 8 characters long.</string>
+    <string name="error5">Registration failed.</string>
+    <string name="to_register">"Don't have an account? Sign up."</string>
+    <string name="to_login">"Back to Login."</string>
+
 </resources>

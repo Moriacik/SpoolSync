@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,6 +42,10 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val lightGrayColor = colorResource(R.color.light_gray)
     val darkGrayColor = colorResource(R.color.dark_gray)
+    val message1 = stringResource(R.string.error1)
+    val message3 = stringResource(R.string.error3)
+    val message4 = stringResource(R.string.error4)
+    val message5 = stringResource(R.string.error5)
 
     Column(
         modifier = Modifier
@@ -60,7 +65,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email", color = darkGrayColor) },
+            label = { Text(stringResource(R.string.email), color = darkGrayColor) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -77,7 +82,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Heslo", color = darkGrayColor) },
+            label = { Text(stringResource(R.string.password), color = darkGrayColor) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -95,7 +100,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Potvrdenie hesla", color = darkGrayColor) },
+            label = { Text(stringResource(R.string.re_password), color = darkGrayColor) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -121,22 +126,32 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         Button(
             onClick = {
                 when {
-                    email.isBlank() || password.isBlank() ->
-                        errorMessage = "Vyplňte všetky polia"
-                    password != confirmPassword ->
-                        errorMessage = "Heslá sa nezhodujú"
-                    password.length < 8 ->
-                        errorMessage = "Heslo musí mať aspoň 8 znakov"
+                    email.isBlank() || password.isBlank() -> {
+                        errorMessage = message1
+                    }
+                    password != confirmPassword -> {
+                        errorMessage = message3
+                    }
+                    password.length < 8 -> {
+                        errorMessage = message4
+                    }
                     else -> {
                         isLoading = true
-                        authViewModel.registerUser(email, password) { success, errorMsg ->
-                            isLoading = false
-                            if (success) {
+                        authViewModel.registerUser(
+                            email = email,
+                            password = password,
+                            onSuccess = {
+                                isLoading = false
                                 navController.popBackStack()
-                            } else {
-                                errorMessage = errorMsg ?: "Registrácia zlyhala"
+                                navController.navigate("filaments") {
+                                    popUpTo("register") { inclusive = true }
+                                }
+                            },
+                            onError = { error ->
+                                isLoading = false
+                                errorMessage = error ?: message5
                             }
-                        }
+                        )
                     }
                 }
             },
@@ -145,14 +160,19 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                 .height(50.dp),
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = lightGrayColor,
-                contentColor = darkGrayColor
-            )
+                containerColor = colorResource(R.color.light_gray),
+                contentColor = colorResource(R.color.dark_gray)
+            ),
+            enabled = !isLoading
         ) {
             if (isLoading) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
+                )
             } else {
-                Text("Registrovať sa")
+                Text(stringResource(R.string.register))
             }
         }
 
@@ -161,7 +181,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
             modifier = Modifier.padding(top = 8.dp)
         ) {
             Text(
-                text = "Späť na prihlásenie",
+                text = stringResource(R.string.to_login),
                 color = lightGrayColor
             )
         }

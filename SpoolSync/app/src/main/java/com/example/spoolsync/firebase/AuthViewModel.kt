@@ -42,38 +42,31 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun registerUser(email: String, password: String, callback: (Boolean, String?) -> Unit) {
-        try {
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val user = mapOf(
-                            "email" to email,
-                            "createdAt" to System.currentTimeMillis()
-                        )
-                        db.collection("users").document(auth.currentUser?.uid ?: "")
-                            .set(user)
-                            .addOnSuccessListener {
-                                Log.d(TAG, "User registered successfully")
-                                callback(true, null)
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e(TAG, "Firestore error: ${e.message}", e)
-                                callback(false, "Chyba pri vytváraní profilu: ${e.message}")
-                            }
-                    } else {
-                        val errorMessage = "Registrácia zlyhala: ${task.exception?.message ?: "Neznáma chyba"}"
-                        Log.e(TAG, errorMessage, task.exception)
-                        callback(false, errorMessage)
-                    }
+    fun registerUser(
+        email: String,
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+
+                    val user = hashMapOf(
+                        "email" to email,
+                        "createdAt" to System.currentTimeMillis(),
+                        "filaments" to arrayListOf<HashMap<String, String>>()
+                    )
+
+                    db.collection("users").document(auth.currentUser?.uid ?: "")
+                        .set(user)
+                        .addOnSuccessListener { onSuccess() }
+                        .addOnFailureListener { e ->
+                            onError(e.localizedMessage ?: "Failed to create user profile")
+                        }
+                } else {
+                    onError(task.exception?.localizedMessage ?: "Registration failed")
                 }
-                .addOnFailureListener { e ->
-                    Log.e(TAG, "Registration error: ${e.message}", e)
-                    callback(false, "Chyba registrácie: ${e.message}")
-                }
-        } catch (e: Exception) {
-            Log.e(TAG, "Exception during registration", e)
-            callback(false, "Chyba: ${e.message}")
-        }
+            }
     }
 }
