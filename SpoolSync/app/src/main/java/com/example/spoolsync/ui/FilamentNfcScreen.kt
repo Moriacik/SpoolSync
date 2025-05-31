@@ -41,7 +41,6 @@ fun FilamentNfcScreen(
     var errorMessage by remember { mutableStateOf("") }
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
 
-    // Activate NFC Reader
     DisposableEffect(Unit) {
         val nfcCallback = object : NfcAdapter.ReaderCallback {
             override fun onTagDiscovered(tag: Tag?) {
@@ -177,20 +176,14 @@ fun FilamentNfcScreen(
                 onClick = {
                     if (nfcId.isNotEmpty()) {
                         isLoading = true
-                        android.util.Log.d("FilamentNfcScreen", "Attempting to load filament with ID: $nfcId")
                         filamentViewModel.loadFilamentById(nfcId) { success ->
                             isLoading = false
-                            android.util.Log.d("FilamentNfcScreen", "Load filament result: $success")
                             if (success) {
-                                android.util.Log.d("FilamentNfcScreen", "Navigating to filamentEdit/$nfcId")
-                                navController.navigate("filamentEdit/$nfcId")
+                                navController.navigate("filamentView/$nfcId")
                             } else {
                                 errorMessage = "Filament not found"
-                                android.util.Log.e("FilamentNfcScreen", "Error: Filament not found")
                             }
                         }
-                    } else {
-                        android.util.Log.e("FilamentNfcScreen", "Error: NFC ID is empty")
                     }
                 },
                 enabled = !isLoading,

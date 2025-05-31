@@ -55,7 +55,7 @@ fun SpoolSyncApp() {
         }
 
         composable(
-            "filamentEdit/{filamentId}",
+            "filamentView/{filamentId}",
             arguments = listOf(navArgument("filamentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val filamentId = backStackEntry.arguments?.getString("filamentId") ?: ""
@@ -63,7 +63,7 @@ fun SpoolSyncApp() {
             FilamentFormScreen(
                 navController = navController,
                 filamentViewModel = filamentViewModel,
-                mode = FilamentFormMode.EDIT,
+                mode = FilamentFormMode.VIEW,
                 initialFilament = filamentViewModel.filaments.find { it.id == filamentId }
             )
         }

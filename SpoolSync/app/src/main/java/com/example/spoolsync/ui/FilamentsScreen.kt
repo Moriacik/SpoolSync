@@ -2,6 +2,7 @@ package com.example.spoolsync.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -124,7 +125,7 @@ fun FilamentsScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 items(filamentViewModel.filaments) { filament ->
-                    FilamentItem(filament)
+                    FilamentItem(filament, navController)
                     Divider(color = Color.LightGray)
                 }
             }
@@ -163,11 +164,12 @@ fun CategoryChip(category: String) {
 }
 
 @Composable
-fun FilamentItem(filament: Filament) {
+fun FilamentItem(filament: Filament, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable { navController.navigate("filamentView/${filament.id}") },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
