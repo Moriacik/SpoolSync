@@ -27,7 +27,7 @@ fun SpoolSyncApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "filaments",
     ) {
         composable("login") {
             LoginScreen(navController, authViewModel)

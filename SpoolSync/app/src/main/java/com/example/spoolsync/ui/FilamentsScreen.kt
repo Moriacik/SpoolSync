@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -19,7 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -140,8 +143,8 @@ fun FilamentsScreen(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(listOf("All", "Prusa MK3S", "Bambulab A1", "Packed", "Unpacked")) { category ->
-                    CategoryChip(category = category)
+                items(listOf(R.drawable.filament, R.drawable.printer , R.drawable.box_closed, R.drawable.box_opened)) { imageResource ->
+                    CategoryChip(imageResource = imageResource)
                 }
             }
         }
@@ -149,16 +152,34 @@ fun FilamentsScreen(
 }
 
 @Composable
-fun CategoryChip(category: String) {
-    Surface(
-        shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.primaryContainer,
+fun CategoryChip(imageResource: Int) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(4.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .size(96.dp)
+                .background(color = colorResource(R.color.light_gray), shape = RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(imageResource),
+                contentDescription = "Filamenty",
+                modifier = Modifier.size(70.dp)
+            )
+        }
+
         Text(
-            text = category,
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            text = when (imageResource) {
+                R.drawable.filament -> "Všetky"
+                R.drawable.printer -> "V tlačiarni"
+                R.drawable.box_closed -> "Zatvorene"
+                R.drawable.box_opened -> "Otvorene"
+                else -> "Neznáma kategória"
+            },
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.align(Alignment.Start)
         )
     }
 }

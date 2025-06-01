@@ -2,6 +2,7 @@ package com.example.spoolsync.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
@@ -28,7 +30,9 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +40,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -81,34 +86,18 @@ fun FilamentFormScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = when (mode) {
-                            VIEW -> "Filament Info"
-                            ADD -> "Add Filament"
-                            EDIT -> "Edit Filament"
-                        },
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* Account action */ }) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Account"
+                            painter = painterResource(R.drawable.info),
+                            contentDescription = "Info",
+                            Modifier.size(20.dp)
                         )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Notification action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
-                        )
-                    }
-                    IconButton(onClick = { /* Settings action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings"
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "Filament Info",
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -298,12 +287,9 @@ private fun EditableFilamentForm(
 ) {
     Column {
         // Color field
-        FormFieldWithIcon(
-            icon = painterResource(R.drawable.collor),
-            value = filament.color,
-            onValueChange = { onFilamentChange(filament.copy(color = it)) },
-            hint = "Color",
-            isEditable = true
+        ColorPicker(
+            selectedColor = filament.color,
+            onColorSelected = { onFilamentChange(filament.copy(color = it)) }
         )
 
         // Weight field
@@ -316,21 +302,19 @@ private fun EditableFilamentForm(
         )
 
         // Status field
-        FormFieldWithIcon(
-            icon = painterResource(R.drawable.status),
-            value = filament.status,
-            onValueChange = { onFilamentChange(filament.copy(status = it)) },
-            hint = "Status",
-            isEditable = true
+        DropdownField(
+            label = "Status",
+            options = listOf("Zatvorene", "Otvorene", "V tlačiarni"),
+            selectedOption = filament.status,
+            onOptionSelected = { onFilamentChange(filament.copy(status = it)) }
         )
 
         // Expiration date field
-        FormFieldWithIcon(
-            icon = painterResource(R.drawable.expiration),
-            value = filament.expirationDate,
-            onValueChange = { onFilamentChange(filament.copy(expirationDate = it)) },
-            hint = "Expiration Date",
-            isEditable = true
+        DropdownField(
+            label = "Expiration Date",
+            options = listOf("Týždeň", "Mesiac", "Rok"),
+            selectedOption = filament.expirationDate,
+            onOptionSelected = { onFilamentChange(filament.copy(expirationDate = it)) }
         )
     }
 }
@@ -431,6 +415,71 @@ private fun FormFieldWithIcon(
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (value.isEmpty()) Color.Gray else Color.Black,
                     modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownField(
+    label: String,
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column {
+        Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 8.dp))
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            TextField(
+                value = selectedOption,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier.menuAnchor(),
+                trailingIcon = {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                }
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onOptionSelected(option)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ColorPicker(
+    selectedColor: String,
+    onColorSelected: (String) -> Unit
+) {
+    val colors = listOf("Red", "Green", "Blue", "Yellow", "Black", "White")
+    Column {
+        Text("Color", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            colors.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color(android.graphics.Color.parseColor(color)), shape = CircleShape)
+                        .border(2.dp, if (selectedColor == color) Color.Black else Color.Transparent, CircleShape)
+                        .clickable { onColorSelected(color) }
                 )
             }
         }

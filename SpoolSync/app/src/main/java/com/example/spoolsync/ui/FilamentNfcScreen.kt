@@ -10,6 +10,8 @@ import androidx.navigation.NavController
 import com.example.spoolsync.FilamentViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,15 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spoolsync.R
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +39,8 @@ fun FilamentNfcScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
+    var lightGrayColor = colorResource(R.color.light_gray)
+    var darkGrayColor = colorResource(R.color.dark_gray)
 
     DisposableEffect(Unit) {
         val nfcCallback = object : NfcAdapter.ReaderCallback {
@@ -125,25 +126,16 @@ fun FilamentNfcScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // NFC Icon
             Image(
-                painter = painterResource(R.drawable.status),
+                painter = painterResource(R.drawable.nfc),
                 contentDescription = "NFC Icon",
                 modifier = Modifier
-                    .size(120.dp)
-                    .padding(32.dp)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "NFC",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                    .size(200.dp)
+                    .padding(16.dp)
             )
 
             Text(
@@ -152,7 +144,7 @@ fun FilamentNfcScreen(
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Text(
                 text = "or",
@@ -160,17 +152,25 @@ fun FilamentNfcScreen(
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // Manual ID Input
             OutlinedTextField(
                 value = nfcId,
                 onValueChange = { nfcId = it },
-                label = { Text("Enter ID manually") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Enter ID manually", color = darkGrayColor) },
+                modifier = Modifier
+                    .width(280.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = lightGrayColor,
+                    unfocusedBorderColor = lightGrayColor,
+                    cursorColor = lightGrayColor,
+                    unfocusedLabelColor = lightGrayColor,
+                    focusedLabelColor = lightGrayColor,
+                )
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
@@ -187,7 +187,14 @@ fun FilamentNfcScreen(
                     }
                 },
                 enabled = !isLoading,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(280.dp),
+                shape = RoundedCornerShape(25.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = lightGrayColor,
+                    contentColor = darkGrayColor
+                )
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
