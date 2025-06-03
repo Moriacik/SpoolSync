@@ -66,6 +66,8 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.media3.common.ktx)
+    implementation(libs.godaddy.android.colorpicker)
+    implementation(libs.godaddy.android.colorpicker.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,4 +1,4 @@
-package com.example.spoolsync.ui
+package com.example.spoolsync.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,7 +31,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
-import com.example.spoolsync.firebase.AuthViewModel
+import com.example.spoolsync.viewModels.AuthViewModel
 
 @Composable
 fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {

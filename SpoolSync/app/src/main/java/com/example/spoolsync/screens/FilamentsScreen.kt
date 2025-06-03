@@ -1,4 +1,4 @@
-package com.example.spoolsync.ui
+package com.example.spoolsync.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,11 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.spoolsync.FilamentViewModel
+import com.example.spoolsync.viewModels.FilamentViewModel
 import com.example.spoolsync.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,9 +196,9 @@ fun FilamentItem(filament: Filament, navController: NavController) {
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .border(1.dp, Color.Black, CircleShape)
-                .background(Color.Red, shape = CircleShape)
+                .size(50.dp)
+                .border(2.dp, Color.Black, CircleShape)
+                .background(Color(filament.color.toColorInt()), shape = CircleShape)
         )
 
         Column(
@@ -240,5 +240,6 @@ data class Filament(
     val weight: String,
     val status: String,
     val color: String,
-    val expirationDate: String
+    val expirationDate: String,
+    val note: String
 )

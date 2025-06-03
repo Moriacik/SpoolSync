@@ -1,4 +1,4 @@
-package com.example.spoolsync.firebase
+package com.example.spoolsync.viewModels
 
 import android.app.Application
 import android.util.Log

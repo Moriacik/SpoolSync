@@ -1,21 +1,20 @@
 package com.example.spoolsync
 
-import android.app.Application
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.spoolsync.firebase.AuthViewModel
-import com.example.spoolsync.ui.FilamentFormMode
-import com.example.spoolsync.ui.FilamentFormScreen
-import com.example.spoolsync.ui.FilamentsScreen
-import com.example.spoolsync.ui.LoginScreen
-import com.example.spoolsync.ui.RegisterScreen
-import com.example.spoolsync.ui.FilamentNfcScreen
+import com.example.spoolsync.viewModels.AuthViewModel
+import com.example.spoolsync.viewModels.FilamentViewModel
+import com.example.spoolsync.screens.FilamentFormMode
+import com.example.spoolsync.screens.FilamentFormScreen
+import com.example.spoolsync.screens.FilamentsScreen
+import com.example.spoolsync.screens.LoginScreen
+import com.example.spoolsync.screens.RegisterScreen
+import com.example.spoolsync.screens.FilamentNfcScreen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -48,9 +47,9 @@ fun SpoolSyncApp() {
         composable("filamentAdd") {
             FilamentFormScreen(
                 navController = navController,
-                filamentViewModel = filamentViewModel,
                 mode = FilamentFormMode.ADD,
-                initialFilament = null
+                initialFilament = null,
+                filamentViewModel = filamentViewModel
             )
         }
 
@@ -59,12 +58,11 @@ fun SpoolSyncApp() {
             arguments = listOf(navArgument("filamentId") { type = NavType.StringType })
         ) { backStackEntry ->
             val filamentId = backStackEntry.arguments?.getString("filamentId") ?: ""
-            android.util.Log.d("NavigationGraph", "Navigated to FilamentFormScreen with ID: $filamentId")
             FilamentFormScreen(
                 navController = navController,
-                filamentViewModel = filamentViewModel,
                 mode = FilamentFormMode.VIEW,
-                initialFilament = filamentViewModel.filaments.find { it.id == filamentId }
+                initialFilament = filamentViewModel.filaments.find { it.id == filamentId },
+                filamentViewModel = filamentViewModel
             )
         }
 
