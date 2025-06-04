@@ -86,7 +86,7 @@ fun FilamentsScreen(
                     )
                     NavigationBarItem(
                         selected = false,
-                        onClick = { navController.navigate("filamentNfc") },
+                        onClick = { navController.navigate("filamentNfcRead") },
                         icon = {
                             // Icon(
                             //     painter = painterResource(R.drawable.ic_info),
@@ -143,7 +143,7 @@ fun FilamentsScreen(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(listOf(R.drawable.filament, R.drawable.printer , R.drawable.box_closed, R.drawable.box_opened)) { imageResource ->
+                items(listOf(R.drawable.ic_filament, R.drawable.ic_printer , R.drawable.ic_box_closed, R.drawable.ic_box_opened)) { imageResource ->
                     CategoryChip(imageResource = imageResource)
                 }
             }
@@ -172,10 +172,10 @@ fun CategoryChip(imageResource: Int) {
 
         Text(
             text = when (imageResource) {
-                R.drawable.filament -> "Všetky"
-                R.drawable.printer -> "V tlačiarni"
-                R.drawable.box_closed -> "Zatvorene"
-                R.drawable.box_opened -> "Otvorene"
+                R.drawable.ic_filament -> "Všetky"
+                R.drawable.ic_printer -> "V tlačiarni"
+                R.drawable.ic_box_closed -> "Zatvorene"
+                R.drawable.ic_box_opened -> "Otvorene"
                 else -> "Neznáma kategória"
             },
             style = MaterialTheme.typography.bodyLarge,
@@ -197,7 +197,7 @@ fun FilamentItem(filament: Filament, navController: NavController) {
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .border(2.dp, Color.Black, CircleShape)
+                .border(2.dp, Color.DarkGray, CircleShape)
                 .background(Color(filament.color.toColorInt()), shape = CircleShape)
         )
 
@@ -241,5 +241,6 @@ data class Filament(
     val status: String,
     val color: String,
     val expirationDate: String,
+    val activeNfc: String,
     val note: String
 )

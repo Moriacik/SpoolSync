@@ -1,5 +1,7 @@
 package com.example.spoolsync.screens
 
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
@@ -23,12 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spoolsync.R
+import kotlinx.coroutines.launch
+import kotlin.collections.get
+import kotlin.text.toInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilamentNfcScreen(
     navController: NavController,
-    filamentViewModel: FilamentViewModel = viewModel()
+    filamentViewModel: FilamentViewModel = viewModel(),
+    mode: FilamentNfcScreenMode,
+    filamentId: String? = null
 ) {
     val context = LocalContext.current
     var nfcId by remember { mutableStateOf("") }
@@ -37,25 +44,32 @@ fun FilamentNfcScreen(
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
     var lightGrayColor = colorResource(R.color.light_gray)
     var darkGrayColor = colorResource(R.color.dark_gray)
+    val coroutineScope = rememberCoroutineScope()
 
     DisposableEffect(Unit) {
         val nfcCallback = object : NfcAdapter.ReaderCallback {
             override fun onTagDiscovered(tag: Tag?) {
-                tag?.let {
-                    val ndef = Ndef.get(tag)
-                    try {
-                        ndef?.connect()
-                        val message = ndef?.ndefMessage
-                        val payload = message?.records?.get(0)?.payload
-                        if (payload != null) {
-                            val languageCodeLength = payload[0].toInt() and 0x3F
-                            nfcId = String(payload, languageCodeLength + 1, payload.size - languageCodeLength - 1, Charsets.UTF_8)
+                if (mode == FilamentNfcScreenMode.READ) {
+                    readNfcTag(tag, { id ->
+                        nfcId = id
+                    }, { error ->
+                        errorMessage = error
+                    })
+                } else if (mode == FilamentNfcScreenMode.UPDATE && filamentId != null) {
+                    updateNfcTag(
+                        filamentId,
+                        tag,
+                        filamentViewModel,
+                        onSuccess = {
+                            nfcId = filamentId
+                            coroutineScope.launch {
+                                navController.navigate("filamentView/$filamentId")
+                            }
+                        },
+                        onError = { error ->
+                            errorMessage = error
                         }
-                    } catch (e: Exception) {
-                        errorMessage = "Error reading NFC tag: ${e.message}"
-                    } finally {
-                        ndef?.close()
-                    }
+                    )
                 }
             }
         }
@@ -80,7 +94,7 @@ fun FilamentNfcScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.info),
+                            painter = painterResource(R.drawable.ic_info),
                             contentDescription = "Info",
                             Modifier.size(20.dp)
                         )
@@ -140,68 +154,151 @@ fun FilamentNfcScreen(
                 color = Color.Gray
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Text(
-                text = "or",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            OutlinedTextField(
-                value = nfcId,
-                onValueChange = { nfcId = it },
-                label = { Text("Enter ID manually", color = darkGrayColor) },
-                modifier = Modifier
-                    .width(280.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = lightGrayColor,
-                    unfocusedBorderColor = lightGrayColor,
-                    cursorColor = lightGrayColor,
-                    unfocusedLabelColor = lightGrayColor,
-                    focusedLabelColor = lightGrayColor,
+            if (mode == FilamentNfcScreenMode.READ) {
+                Text(
+                    text = "or",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
                 )
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
-            Button(
-                onClick = {
-                    if (nfcId.isNotEmpty()) {
-                        isLoading = true
-                        filamentViewModel.loadFilamentById(nfcId) { success ->
-                            isLoading = false
-                            if (success) {
-                                navController.navigate("filamentView/$nfcId")
-                            } else {
-                                errorMessage = "Filament not found"
+                OutlinedTextField(
+                    value = nfcId,
+                    onValueChange = { nfcId = it },
+                    label = { Text("Enter ID manually", color = darkGrayColor) },
+                    modifier = Modifier
+                        .width(280.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = lightGrayColor,
+                        unfocusedBorderColor = lightGrayColor,
+                        cursorColor = lightGrayColor,
+                        unfocusedLabelColor = lightGrayColor,
+                        focusedLabelColor = lightGrayColor,
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (nfcId.isNotEmpty()) {
+                            isLoading = true
+                            filamentViewModel.loadFilamentById(nfcId) { success ->
+                                isLoading = false
+                                if (success) {
+                                    navController.navigate("filamentView/$nfcId")
+                                } else {
+                                    errorMessage = "Filament not found"
+                                }
                             }
                         }
-                    }
-                },
-                enabled = !isLoading,
-                modifier = Modifier
-                    .height(50.dp)
-                    .width(280.dp),
-                shape = RoundedCornerShape(25.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = lightGrayColor,
-                    contentColor = darkGrayColor
-                )
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
+                    },
+                    enabled = !isLoading,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .width(280.dp),
+                    shape = RoundedCornerShape(25.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = lightGrayColor,
+                        contentColor = darkGrayColor
                     )
-                } else {
-                    Text("Continue")
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("Continue")
+                    }
                 }
+            }
+
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
         }
     }
+}
+
+fun readNfcTag(
+    tag: Tag?,
+    onNfcRead: (String) -> Unit,
+    onError: (String) -> Unit
+) {
+    tag?.let {
+        val ndef = Ndef.get(tag)
+        try {
+            ndef?.connect()
+            val message = ndef?.ndefMessage
+            val payload = message?.records?.get(0)?.payload
+            if (payload != null) {
+                val languageCodeLength = payload[0].toInt() and 0x3F
+                val nfcId = String(payload, languageCodeLength + 1, payload.size - languageCodeLength - 1, Charsets.UTF_8)
+                onNfcRead(nfcId)
+            }
+        } catch (e: Exception) {
+            onError("Error reading NFC tag: ${e.message}")
+        } finally {
+            ndef?.close()
+        }
+    }
+}
+
+fun updateNfcTag(
+    filamentId: String,
+    tag: Tag?,
+    filamentViewModel: FilamentViewModel,
+    onSuccess: () -> Unit,
+    onError: (String) -> Unit
+) {
+    tag?.let {
+        try {
+            val ndef = Ndef.get(tag)
+            ndef?.connect()
+
+            if (ndef != null) {
+                // Make sure the tag is writable
+                if (!ndef.isWritable) {
+                    onError("NFC tag is not writable")
+                    return
+                }
+
+                // Get max size
+                val maxSize = ndef.maxSize
+                if (filamentId.length > maxSize) {
+                    onError("Data too large for NFC tag")
+                    return
+                }
+
+                // Create and write the message
+                val record = NdefRecord.createTextRecord("en", filamentId)
+                val message = NdefMessage(arrayOf(record))
+                ndef.writeNdefMessage(message)
+
+                filamentViewModel.updateFilamentNfcStatus(filamentId, "true")
+
+                onSuccess()
+            } else {
+                onError("Tag doesn't support NDEF")
+            }
+        } catch (e: Exception) {
+            onError("Error updating NFC tag: ${e.message}")
+        } finally {
+            try {
+                Ndef.get(tag)?.close()
+            } catch (e: Exception) { }
+        }
+    } ?: onError("Tag is null")
+}
+
+enum class FilamentNfcScreenMode {
+    READ, UPDATE
 }

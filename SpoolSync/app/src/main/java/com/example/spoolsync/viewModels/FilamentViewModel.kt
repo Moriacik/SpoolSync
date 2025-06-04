@@ -45,6 +45,7 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
                             status = data["status"] as? String ?: "",
                             color = data["color"] as? String ?: "",
                             expirationDate = data["expirationDate"] as? String ?: "",
+                            activeNfc = data["activeNfc"] as? String ?: "",
                             note = data["note"] as? String ?: ""
                         )
                     )
@@ -61,6 +62,7 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             status = filament.status,
             color = filament.color,
             expirationDate = filament.expirationDate,
+            activeNfc = filament.activeNfc,
             note = filament.note
         )
 
@@ -111,6 +113,7 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
                             status = matchingFilament["status"] as? String ?: "",
                             color = matchingFilament["color"] as? String ?: "",
                             expirationDate = matchingFilament["expirationDate"] as? String ?: "",
+                            activeNfc = matchingFilament["activeNfc"] as? String ?: "",
                             note = matchingFilament["note"] as? String ?: ""
                         )
                         callback(true)
@@ -123,6 +126,26 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
             .addOnFailureListener {
                 callback(false)
+            }
+    }
+
+    fun updateFilamentNfcStatus(filamentId: String, status: String) {
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val userFilaments = document.get("filaments") as? MutableList<Map<String, Any>> ?: mutableListOf()
+                val updatedFilaments = userFilaments.map { existingFilament ->
+                    if (existingFilament["id"] == filamentId) {
+                        existingFilament.toMutableMap().apply {
+                            this["activeNfc"] = status
+                        }
+                    } else {
+                        existingFilament
+                    }
+                }
+
+                db.collection("users").document(userId)
+                    .update("filaments", updatedFilaments)
             }
     }
 }

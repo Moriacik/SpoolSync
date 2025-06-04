@@ -15,6 +15,7 @@ import com.example.spoolsync.screens.FilamentsScreen
 import com.example.spoolsync.screens.LoginScreen
 import com.example.spoolsync.screens.RegisterScreen
 import com.example.spoolsync.screens.FilamentNfcScreen
+import com.example.spoolsync.screens.FilamentNfcScreenMode
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -26,7 +27,7 @@ fun SpoolSyncApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "filaments",
+        startDestination = "login",
     ) {
         composable("login") {
             LoginScreen(navController, authViewModel)
@@ -66,8 +67,25 @@ fun SpoolSyncApp() {
             )
         }
 
-        composable("filamentNfc") {
-            FilamentNfcScreen(navController)
+        composable("filamentNfcRead") {
+            FilamentNfcScreen(
+                navController,
+                filamentViewModel,
+                FilamentNfcScreenMode.READ,
+                null
+            )
+        }
+
+        composable("filamentNfcUpdate/{filamentId}",
+            arguments = listOf(navArgument("filamentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val filamentId = backStackEntry.arguments?.getString("filamentId") ?: ""
+            FilamentNfcScreen(
+                navController,
+                filamentViewModel,
+                FilamentNfcScreenMode.UPDATE,
+                filamentId
+            )
         }
     }
 }
