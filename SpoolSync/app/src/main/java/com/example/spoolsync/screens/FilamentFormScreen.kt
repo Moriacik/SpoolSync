@@ -35,6 +35,8 @@ import com.godaddy.android.colorpicker.toColorInt
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import com.example.spoolsync.viewModels.FilamentViewModel
 
 enum class FilamentFormMode {
@@ -60,17 +62,17 @@ fun FilamentFormScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(R.drawable.ic_info),
-                            contentDescription = "Info",
+                            contentDescription = stringResource(R.string.info),
                             Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Text(text = "Filament Info", fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.info), fontWeight = FontWeight.Bold)
                     }
                 },
                 actions = {
                     if (!isEditing) {
                         IconButton(onClick = { isEditing = true }) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                         }
                     }
                 }
@@ -78,21 +80,52 @@ fun FilamentFormScreen(
         },
         bottomBar = {
             BottomAppBar(containerColor = colorResource(R.color.nav_bar)) {
-                NavigationBar(containerColor = Color.Transparent) {
+                NavigationBar(
+                    containerColor = Color.Transparent
+                ) {
                     NavigationBarItem(
                         selected = false,
                         onClick = { navController.navigate("filaments") },
-                        icon = { Text("Filamenty") }
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_filament),
+                                contentDescription = stringResource(R.string.filaments),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(48.dp),
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                     NavigationBarItem(
                         selected = true,
-                        onClick = {},
-                        icon = { Text("Info") }
+                        onClick = {  },
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_info),
+                                contentDescription = stringResource(R.string.info),
+                                modifier = Modifier.size(48.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                     NavigationBarItem(
                         selected = false,
-                        onClick = { navController.navigate("print") },
-                        icon = { Text("Tlačiť") }
+                        onClick = { navController.navigate("ocr") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_printer),
+                                contentDescription = stringResource(R.string.print),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                 }
             }
@@ -119,7 +152,7 @@ fun FilamentFormScreen(
                 ) {
                     Image(
                         painter = painterResource(R.drawable.ic_filament),
-                        contentDescription = "Upload photo",
+                        contentDescription = stringResource(R.string.photo),
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.size(200.dp)
                     )
@@ -135,7 +168,7 @@ fun FilamentFormScreen(
                     TextField(
                         value = filament.type,
                         onValueChange = { filament = filament.copy(type = it) },
-                        placeholder = { Text("Type", color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.type), color = Color.Gray) },
                         textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 40.sp),
                         colors = TextFieldDefaults.colors(
                             focusedIndicatorColor = Color.Transparent,
@@ -151,7 +184,7 @@ fun FilamentFormScreen(
                     TextField(
                         value = filament.brand,
                         onValueChange = { filament = filament.copy(brand = it) },
-                        placeholder = { Text("Brand", color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.brand), color = Color.Gray) },
                         textStyle = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = 20.sp,
                             textAlign = TextAlign.End
@@ -176,7 +209,7 @@ fun FilamentFormScreen(
                         .padding(32.dp, 32.dp, 32.dp, 12.dp),
                 ) {
                     Text(
-                        text = if (filament.type == "") "Type" else filament.type,
+                        text = if (filament.type == "") stringResource(R.string.type) else filament.type,
                         fontSize = 40.sp,
                         color = Color.Black,
                         modifier = Modifier
@@ -184,7 +217,7 @@ fun FilamentFormScreen(
                             .height(50.dp)
                     )
                     Text(
-                        text = if (filament.brand == "") "Brand" else filament.brand,
+                        text = if (filament.brand == "") stringResource(R.string.brand) else filament.brand,
                         fontSize = 20.sp,
                         color = Color.Black,
                         textAlign = TextAlign.End,
@@ -211,7 +244,7 @@ fun FilamentFormScreen(
                 Divider(modifier = Modifier.padding(vertical = 4.dp))
 
                 Text(
-                    text = "Note",
+                    text = stringResource(R.string.note),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 16.dp)
@@ -227,7 +260,7 @@ fun FilamentFormScreen(
                     ) {
                         TextField(
                             value = filament.note,
-                            placeholder = { Text("Optional note about the filament...", color = Color.Gray) },
+                            placeholder = { Text(stringResource(R.string.optional_note), color = Color.Gray) },
                             onValueChange = { filament = filament.copy(note = it) },
                             textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.Black),
                             colors = TextFieldDefaults.colors(
@@ -263,8 +296,8 @@ fun FilamentFormScreen(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = "Submit")
-                            Text("Submit")
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.submit))
+                            Text(stringResource(R.string.submit))
                         }
 
                         Spacer(modifier = Modifier.width(16.dp))
@@ -281,8 +314,8 @@ fun FilamentFormScreen(
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = "Cancel")
-                            Text("Cancel")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
+                            Text(stringResource(R.string.cancel))
                         }
                     }
                 } else {
@@ -341,7 +374,7 @@ private fun EditableFilamentForm(
             id = filament.id,
             onValueChange = { onFilamentChange(filament.copy(status = it)) },
             inputType = InputType.DROPDOWN,
-            options = listOf("Zatvorene", "Otvorene", "V tlačiarni"),
+            options = stringArrayResource(R.array.filament_status_options).toList(),
             navController = navController,
             isEditable = true
         )
@@ -352,7 +385,7 @@ private fun EditableFilamentForm(
             id = filament.id,
             onValueChange = { onFilamentChange(filament.copy(expirationDate = it)) },
             inputType = InputType.DROPDOWN,
-            options = listOf("Týždeň", "Mesiac", "Rok"),
+            options = stringArrayResource(R.array.filament_expiration_options).toList(),
             navController = navController,
             isEditable = true
         )
@@ -379,7 +412,7 @@ private fun FilamentInfoDisplay(
     Column {
         FormWithIcon(
             icon = painterResource(R.drawable.ic_collor),
-            value = filament.color.ifEmpty { "Not specified" },
+            value = filament.color.ifEmpty { stringResource(R.string.not_specified) },
             id = filament.id,
             onValueChange = {},
             inputType = InputType.COLOR_PICKER,
@@ -389,7 +422,7 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_weight),
-            value = filament.weight.ifEmpty { "Not specified" },
+            value = filament.weight.ifEmpty { stringResource(R.string.not_specified) },
             id = filament.id,
             onValueChange = {},
             inputType = InputType.WEIGHT_FIELD,
@@ -399,7 +432,7 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_status),
-            value = filament.status.ifEmpty { "Not specified" },
+            value = filament.status.ifEmpty { stringResource(R.string.not_specified) },
             id = filament.id,
             onValueChange = {},
             inputType = InputType.TEXT,
@@ -409,7 +442,7 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_expiration),
-            value = filament.expirationDate.ifEmpty { "Not specified" },
+            value = filament.expirationDate.ifEmpty { stringResource(R.string.not_specified) },
             id = filament.id,
             onValueChange = {},
             inputType = InputType.TEXT,
@@ -421,7 +454,7 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_nfc),
-            value = filament.activeNfc.ifEmpty { "Not specified" },
+            value = filament.activeNfc.ifEmpty { stringResource(R.string.not_specified) },
             id = filament.id,
             onValueChange = {},
             inputType = InputType.NFC_FIELD,
@@ -450,7 +483,7 @@ fun FormWithIcon(
     ) {
         Icon(
             painter = icon,
-            contentDescription = "property icon",
+            contentDescription = stringResource(R.string.filament_status),
             modifier = Modifier.size(24.dp)
         )
 
@@ -493,7 +526,7 @@ fun FormWithIcon(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = if (value == "true") "scanned" else "not scaned",
+                                text = if (value == "true") stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
                                 style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") Color.Green else Color.Red),
                                 modifier = Modifier
                                     .weight(1f)
@@ -507,7 +540,7 @@ fun FormWithIcon(
                                 modifier = Modifier
                                     .padding(end = 10.dp)
                             ) {
-                                Text("Update tag")
+                                Text(stringResource(R.string.update_tag))
                             }
                         }
                     }
@@ -530,13 +563,13 @@ fun FormWithIcon(
                 )
 
                 InputType.NFC_FIELD -> Text(
-                    text = if (value == "true") "scanned" else "not scaned",
+                    text = if (value == "true") stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
                     style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") Color.Green else Color.Red),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 else -> Text(
-                    text = value.ifEmpty { "Not specified" },
+                    text = value.ifEmpty { stringResource(R.string.not_specified) },
                     style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -559,7 +592,7 @@ fun WeightInputField(
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextField(
             value = inputWeight,
-            placeholder = { Text("Weight in grams", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.weight_in_grams), color = Color.Gray) },
             onValueChange = { newValue ->
                 val numericValue = newValue.filter { it.isDigit() }
                 inputWeight = numericValue
@@ -666,10 +699,10 @@ fun ColorPicker(
                 onDismissRequest = { showColorPicker = false },
                 confirmButton = {
                     TextButton(onClick = { showColorPicker = false }) {
-                        Text("OK")
+                        Text(stringResource(R.string.submit))
                     }
                 },
-                title = { Text("Select Color") },
+                title = { Text(stringResource(R.string.select_color)) },
                 text = {
                     Column {
                         ClassicColorPicker(

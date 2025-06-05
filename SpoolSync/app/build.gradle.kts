@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(platform(libs.firebase.bom))
+    implementation(libs.google.mlkit.textrecognition)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.media3.common.ktx)

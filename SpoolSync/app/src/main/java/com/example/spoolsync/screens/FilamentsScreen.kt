@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
@@ -39,14 +41,14 @@ fun FilamentsScreen(
         topBar = {
             TopAppBar(
                 title = {Text(
-                    text = "Filaments",
+                    text = stringResource(R.string.filaments),
                     fontWeight = FontWeight.Bold
                 )},
                 navigationIcon = {
                     IconButton(onClick = { /* Account action */ }) {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Account"
+                            contentDescription = stringResource(R.string.account)
                         )
                     }
                 },
@@ -54,13 +56,13 @@ fun FilamentsScreen(
                     IconButton(onClick = { /* Notification action */ }) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
+                            contentDescription = stringResource(R.string.notifications)
                         )
                     }
                     IconButton(onClick = { /* Settings action */ }) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings"
+                            contentDescription = stringResource(R.string.settings)
                         )
                     }
                 }
@@ -77,34 +79,45 @@ fun FilamentsScreen(
                         selected = true,
                         onClick = { },
                         icon = {
-                            // Icon(
-                            //     painter = painterResource(R.drawable.ic_filament),
-                            //     contentDescription = "Filamenty"
-                            // )
-                            Text("Filamenty")
-                        }
+                            Icon(
+                                painter = painterResource(R.drawable.ic_filament),
+                                contentDescription = stringResource(R.string.filaments),
+                                modifier = Modifier.size(56.dp),
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                     NavigationBarItem(
                         selected = false,
                         onClick = { navController.navigate("filamentNfcRead") },
                         icon = {
-                            // Icon(
-                            //     painter = painterResource(R.drawable.ic_info),
-                            //     contentDescription = "Info"
-                            // )
-                            Text("Info")
-                        }
+                            Icon(
+                                painter = painterResource(R.drawable.ic_info),
+                                contentDescription = stringResource(R.string.info),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                     NavigationBarItem(
                         selected = false,
-                        onClick = { /* Navigácia k tlači */ },
+                        onClick = { navController.navigate("ocr") },
                         icon = {
-                            // Icon(
-                            //     painter = painterResource(R.drawable.ic_print),
-                            //     contentDescription = "Tlačiť"
-                            // )
-                            Text("Tlačiť")
-                        }
+                            Icon(
+                                painter = painterResource(R.drawable.ic_printer),
+                                contentDescription = stringResource(R.string.print),
+                                tint = Color.Gray,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                 }
             }
@@ -120,7 +133,7 @@ fun FilamentsScreen(
                 IconButton(onClick = { navController.navigate("filamentAdd") }) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add",
+                        contentDescription = stringResource(R.string.add),
                     )
                 }
             }
@@ -134,7 +147,7 @@ fun FilamentsScreen(
             }
 
             Text(
-                text = "Kategórie",
+                text = stringResource(R.string.categories),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -165,18 +178,18 @@ fun CategoryChip(imageResource: Int) {
         ) {
             Icon(
                 painter = painterResource(imageResource),
-                contentDescription = "Filamenty",
+                contentDescription = stringResource(R.string.filaments),
                 modifier = Modifier.size(70.dp)
             )
         }
 
         Text(
             text = when (imageResource) {
-                R.drawable.ic_filament -> "Všetky"
-                R.drawable.ic_printer -> "V tlačiarni"
-                R.drawable.ic_box_closed -> "Zatvorene"
-                R.drawable.ic_box_opened -> "Otvorene"
-                else -> "Neznáma kategória"
+                R.drawable.ic_filament -> stringResource(R.string.all)
+                R.drawable.ic_printer -> stringArrayResource(R.array.filament_status_options)[1]
+                R.drawable.ic_box_closed -> stringArrayResource(R.array.filament_status_options)[2]
+                R.drawable.ic_box_opened -> stringArrayResource(R.array.filament_status_options)[3]
+                else -> ""
             },
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.align(Alignment.Start)

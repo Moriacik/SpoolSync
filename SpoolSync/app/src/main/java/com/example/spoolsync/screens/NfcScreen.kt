@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spoolsync.R
 import kotlinx.coroutines.launch
-import kotlin.collections.get
-import kotlin.text.toInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,17 +115,46 @@ fun FilamentNfcScreen(
                     NavigationBarItem(
                         selected = false,
                         onClick = { navController.navigate("filaments") },
-                        icon = { Text("Filamenty") }
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_filament),
+                                contentDescription = "Filamenty",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(48.dp),
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                     NavigationBarItem(
                         selected = true,
-                        onClick = { /* Already on info screen */ },
-                        icon = { Text("Info") }
+                        onClick = {  },
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_info),
+                                contentDescription = "Info",
+                                modifier = Modifier.size(48.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                     NavigationBarItem(
                         selected = false,
-                        onClick = { navController.navigate("print") },
-                        icon = { Text("Tlačiť") }
+                        onClick = { navController.navigate("ocr") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_printer),
+                                contentDescription = "Tlačiť",
+                                tint = Color.Gray,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
                     )
                 }
             }
