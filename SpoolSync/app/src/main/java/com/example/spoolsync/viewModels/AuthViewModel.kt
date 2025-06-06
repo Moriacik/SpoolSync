@@ -2,6 +2,7 @@ package com.example.spoolsync.viewModels
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException

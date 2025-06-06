@@ -24,7 +24,7 @@
     <string name="type">Type</string>
     <string name="brand">Brand</string>
     <string name="note">Note</string>
-    <string name="optional_note">Optional note about the filament...</string>
+    <string name="optional_note">Optional note about the filament…</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="not_specified">Not specified</string>
@@ -57,4 +57,23 @@
     <string name="categories">Categories</string>
     <string name="all">All</string>
 
+    // Nfc strings
+    <string name="nfc">NFC</string>
+    <string name="place_device_close_to_tag">Place device close to tag</string>
+    <string name="or">or</string>
+    <string name="enter_id_manually">Enter ID manually</string>
+    <string name="filament_not_found">Filament not found</string>
+    <string name="nfc_error1">"Error reading NFC tag: </string>
+    <string name="nfc_error2">NFC tag is not writable</string>
+    <string name="nfc_error3">Data too large for NFC tag</string>
+    <string name="nfc_error4">Tag does not support NDEF</string>
+    <string name="nfc_error5">Error updating NFC tag: </string>
+    <string name="nfc_error6">Tag is null</string>
+
+    // Ocr strings
+
+    // Print strings
+
+
+    stringResource(R.string.nfc_error1)
 </resources>

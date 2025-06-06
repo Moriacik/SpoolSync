@@ -90,13 +90,11 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(48.dp),
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                     NavigationBarItem(
                         selected = true,
@@ -108,9 +106,7 @@ fun FilamentFormScreen(
                                 modifier = Modifier.size(48.dp)
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                     NavigationBarItem(
                         selected = false,
@@ -119,13 +115,11 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                 }
             }
@@ -140,14 +134,14 @@ fun FilamentFormScreen(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
-                    .background(Color.LightGray),
+                    .background(colorResource(R.color.light_gray)),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
                         .padding(0.dp, 5.dp, 0.dp, 5.dp)
                         .fillMaxSize()
-                        .background(Color.White),
+                        .background(colorResource(R.color.white)),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
@@ -168,15 +162,15 @@ fun FilamentFormScreen(
                     TextField(
                         value = filament.type,
                         onValueChange = { filament = filament.copy(type = it) },
-                        placeholder = { Text(stringResource(R.string.type), color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.type), color = colorResource(R.color.gray)) },
                         textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 40.sp),
                         colors = TextFieldDefaults.colors(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            focusedTextColor = colorResource(R.color.black),
+                            unfocusedTextColor = colorResource(R.color.black)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -184,7 +178,7 @@ fun FilamentFormScreen(
                     TextField(
                         value = filament.brand,
                         onValueChange = { filament = filament.copy(brand = it) },
-                        placeholder = { Text(stringResource(R.string.brand), color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.brand), color = colorResource(R.color.gray)) },
                         textStyle = MaterialTheme.typography.bodyMedium.copy(
                             fontSize = 20.sp,
                             textAlign = TextAlign.End
@@ -194,8 +188,8 @@ fun FilamentFormScreen(
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = Color.Black,
-                            unfocusedTextColor = Color.Black
+                            focusedTextColor = colorResource(R.color.black),
+                            unfocusedTextColor = colorResource(R.color.black)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -211,7 +205,7 @@ fun FilamentFormScreen(
                     Text(
                         text = if (filament.type == "") stringResource(R.string.type) else filament.type,
                         fontSize = 40.sp,
-                        color = Color.Black,
+                        color = colorResource(R.color.black),
                         modifier = Modifier
                             .weight(1f)
                             .height(50.dp)
@@ -219,7 +213,7 @@ fun FilamentFormScreen(
                     Text(
                         text = if (filament.brand == "") stringResource(R.string.brand) else filament.brand,
                         fontSize = 20.sp,
-                        color = Color.Black,
+                        color = colorResource(R.color.black),
                         textAlign = TextAlign.End,
                         modifier = Modifier
                             .weight(1f)
@@ -256,20 +250,20 @@ fun FilamentFormScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .heightIn(min = 80.dp)
-                            .background(Color.LightGray, RoundedCornerShape(8.dp))
+                            .background(colorResource(R.color.light_gray), RoundedCornerShape(8.dp))
                     ) {
                         TextField(
                             value = filament.note,
-                            placeholder = { Text(stringResource(R.string.optional_note), color = Color.Gray) },
+                            placeholder = { Text(stringResource(R.string.optional_note), color = colorResource(R.color.gray)) },
                             onValueChange = { filament = filament.copy(note = it) },
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color.Black),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = colorResource(R.color.black)),
                             colors = TextFieldDefaults.colors(
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
-                                focusedTextColor = Color.Black,
-                                unfocusedTextColor = Color.Black
+                                focusedTextColor = colorResource(R.color.black),
+                                unfocusedTextColor = colorResource(R.color.black)
                             ),
                             modifier = Modifier
                                 .fillMaxSize()
@@ -312,7 +306,7 @@ fun FilamentFormScreen(
                                 }
                             },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray))
                         ) {
                             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
                             Text(stringResource(R.string.cancel))
@@ -324,12 +318,12 @@ fun FilamentFormScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .heightIn(min = 80.dp)
-                            .background(Color.LightGray, RoundedCornerShape(8.dp))
+                            .background(colorResource(R.color.light_gray), RoundedCornerShape(8.dp))
                     ) {
                         Text(
                             text = filament.note,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray,
+                            color = colorResource(R.color.gray),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(8.dp)
@@ -495,7 +489,7 @@ fun FormWithIcon(
                     InputType.TEXT -> BasicTextField(
                         value = value,
                         onValueChange = onValueChange,
-                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -527,7 +521,7 @@ fun FormWithIcon(
                         ) {
                             Text(
                                 text = if (value == "true") stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
-                                style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") Color.Green else Color.Red),
+                                style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") colorResource(R.color.green) else colorResource(R.color.red)),
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(8.dp)
@@ -536,7 +530,7 @@ fun FormWithIcon(
                                 onClick = {
                                     navController.navigate("filamentNfcUpdate/${id}")
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
                                 modifier = Modifier
                                     .padding(end = 10.dp)
                             ) {
@@ -553,24 +547,24 @@ fun FormWithIcon(
                         modifier = Modifier
                             .size(50.dp)
                             .background(Color(android.graphics.Color.parseColor(value)), CircleShape)
-                            .border(2.dp, Color.DarkGray, CircleShape)
+                            .border(2.dp, colorResource(R.color.dark_gray), CircleShape)
                     )
 
                 InputType.WEIGHT_FIELD -> Text(
                     text = "$value g",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 InputType.NFC_FIELD -> Text(
                     text = if (value == "true") stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") Color.Green else Color.Red),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") colorResource(R.color.green) else colorResource(R.color.red)),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 else -> Text(
                     text = value.ifEmpty { stringResource(R.string.not_specified) },
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -592,20 +586,20 @@ fun WeightInputField(
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextField(
             value = inputWeight,
-            placeholder = { Text(stringResource(R.string.weight_in_grams), color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.weight_in_grams), color = colorResource(R.color.gray)) },
             onValueChange = { newValue ->
                 val numericValue = newValue.filter { it.isDigit() }
                 inputWeight = numericValue
                 onWeightChange(numericValue)
             },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
+                focusedTextColor = colorResource(R.color.black),
+                unfocusedTextColor = colorResource(R.color.black)
             ),
             modifier = Modifier
                 .padding(8.dp)
@@ -617,7 +611,7 @@ fun WeightInputField(
 
         Text(
             text = "g",
-            style = MaterialTheme.typography.bodyLarge.copy(color = Color.Gray),
+            style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.gray)),
             modifier = Modifier.padding(end = 10.dp)
         )
     }
@@ -651,8 +645,8 @@ fun DropdownField(
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedContainerColor = Color.LightGray,
-                    unfocusedContainerColor = Color.LightGray
+                    focusedContainerColor = colorResource(R.color.light_gray),
+                    unfocusedContainerColor = colorResource(R.color.light_gray)
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -660,7 +654,7 @@ fun DropdownField(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .border(1.dp, Color.LightGray)
+                    .border(1.dp, colorResource(R.color.light_gray))
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
@@ -670,7 +664,7 @@ fun DropdownField(
                             expanded = false
                         },
                         modifier = Modifier
-                            .background(Color.White)
+                            .background(colorResource(R.color.white))
                             .padding(8.dp)
                     )
                 }

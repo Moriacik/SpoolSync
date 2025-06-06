@@ -42,8 +42,6 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    val lightGrayColor = colorResource(R.color.light_gray)
-    val darkGrayColor = colorResource(R.color.dark_gray)
     val message1 = stringResource(R.string.error1)
     val message3 = stringResource(R.string.error3)
     val message4 = stringResource(R.string.error4)
@@ -58,8 +56,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = MaterialTheme.typography.headlineMedium
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -67,17 +64,17 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text(stringResource(R.string.email), color = darkGrayColor) },
+            label = { Text(stringResource(R.string.email), color = colorResource(R.color.dark_gray)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = lightGrayColor,
-                unfocusedBorderColor = lightGrayColor,
-                cursorColor = lightGrayColor,
-                unfocusedLabelColor = lightGrayColor,
-                focusedLabelColor = lightGrayColor,
+                focusedBorderColor = colorResource(R.color.light_gray),
+                unfocusedBorderColor = colorResource(R.color.light_gray),
+                cursorColor = colorResource(R.color.light_gray),
+                unfocusedLabelColor = colorResource(R.color.light_gray),
+                focusedLabelColor = colorResource(R.color.light_gray),
             )
         )
 
@@ -86,18 +83,18 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(stringResource(R.string.password), color = darkGrayColor) },
+            label = { Text(stringResource(R.string.password), color = colorResource(R.color.dark_gray)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = lightGrayColor,
-                unfocusedBorderColor = lightGrayColor,
-                cursorColor = lightGrayColor,
-                unfocusedLabelColor = lightGrayColor,
-                focusedLabelColor = lightGrayColor,
+                focusedBorderColor = colorResource(R.color.light_gray),
+                unfocusedBorderColor = colorResource(R.color.light_gray),
+                cursorColor = colorResource(R.color.light_gray),
+                unfocusedLabelColor = colorResource(R.color.light_gray),
+                focusedLabelColor = colorResource(R.color.light_gray),
             )
         )
 
@@ -106,25 +103,25 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text(stringResource(R.string.re_password), color = darkGrayColor) },
+            label = { Text(stringResource(R.string.re_password), color = colorResource(R.color.dark_gray)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = lightGrayColor,
-                unfocusedBorderColor = lightGrayColor,
-                cursorColor = lightGrayColor,
-                unfocusedLabelColor = lightGrayColor,
-                focusedLabelColor = lightGrayColor,
+                focusedBorderColor = colorResource(R.color.light_gray),
+                unfocusedBorderColor = colorResource(R.color.light_gray),
+                cursorColor = colorResource(R.color.light_gray),
+                unfocusedLabelColor = colorResource(R.color.light_gray),
+                focusedLabelColor = colorResource(R.color.light_gray),
             )
         )
 
         if (errorMessage != null) {
             Text(
                 text = errorMessage!!,
-                color = Color.Red,
+                color = colorResource(R.color.red),
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
@@ -190,7 +187,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         ) {
             Text(
                 text = stringResource(R.string.to_login),
-                color = lightGrayColor
+                color = colorResource(R.color.light_gray)
             )
         }
     }

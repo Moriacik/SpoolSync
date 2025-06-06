@@ -82,12 +82,10 @@ fun FilamentsScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
-                                modifier = Modifier.size(56.dp),
+                                modifier = Modifier.size(60.dp),
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                     NavigationBarItem(
                         selected = false,
@@ -96,7 +94,7 @@ fun FilamentsScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -111,13 +109,11 @@ fun FilamentsScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                 }
             }
@@ -142,7 +138,7 @@ fun FilamentsScreen(
             ) {
                 items(filamentViewModel.filaments) { filament ->
                     FilamentItem(filament, navController)
-                    Divider(color = Color.LightGray)
+                    Divider(color = colorResource(R.color.light_gray))
                 }
             }
 
@@ -186,9 +182,9 @@ fun CategoryChip(imageResource: Int) {
         Text(
             text = when (imageResource) {
                 R.drawable.ic_filament -> stringResource(R.string.all)
-                R.drawable.ic_printer -> stringArrayResource(R.array.filament_status_options)[1]
-                R.drawable.ic_box_closed -> stringArrayResource(R.array.filament_status_options)[2]
-                R.drawable.ic_box_opened -> stringArrayResource(R.array.filament_status_options)[3]
+                R.drawable.ic_printer -> stringArrayResource(R.array.filament_status_options)[0]
+                R.drawable.ic_box_closed -> stringArrayResource(R.array.filament_status_options)[1]
+                R.drawable.ic_box_opened -> stringArrayResource(R.array.filament_status_options)[2]
                 else -> ""
             },
             style = MaterialTheme.typography.bodyLarge,
@@ -210,7 +206,7 @@ fun FilamentItem(filament: Filament, navController: NavController) {
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .border(2.dp, Color.DarkGray, CircleShape)
+                .border(2.dp, colorResource(R.color.dark_gray), CircleShape)
                 .background(Color(filament.color.toColorInt()), shape = CircleShape)
         )
 

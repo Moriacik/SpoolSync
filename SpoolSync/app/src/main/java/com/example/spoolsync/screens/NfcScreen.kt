@@ -1,5 +1,6 @@
 package com.example.spoolsync.screens
 
+import android.app.Activity
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,23 +42,34 @@ fun FilamentNfcScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(context)
-    var lightGrayColor = colorResource(R.color.light_gray)
-    var darkGrayColor = colorResource(R.color.dark_gray)
     val coroutineScope = rememberCoroutineScope()
+
+    var error1 = stringResource(R.string.nfc_error1)
+    var error2 = stringResource(R.string.filament_not_found)
+
+    var errors = listOf(
+        stringResource(R.string.nfc_error2),
+        stringResource(R.string.nfc_error3),
+        stringResource(R.string.nfc_error4),
+        stringResource(R.string.nfc_error5),
+        stringResource(R.string.nfc_error6)
+    )
 
     DisposableEffect(Unit) {
         val nfcCallback = object : NfcAdapter.ReaderCallback {
             override fun onTagDiscovered(tag: Tag?) {
                 if (mode == FilamentNfcScreenMode.READ) {
-                    readNfcTag(tag, { id ->
-                        nfcId = id
-                    }, { error ->
-                        errorMessage = error
-                    })
+                    readNfcTag(
+                        tag,
+                        error1,
+                        { id -> nfcId = id },
+                        { error -> errorMessage = error }
+                    )
                 } else if (mode == FilamentNfcScreenMode.UPDATE && filamentId != null) {
                     updateNfcTag(
                         filamentId,
                         tag,
+                        errors,
                         filamentViewModel,
                         onSuccess = {
                             nfcId = filamentId
@@ -73,14 +86,14 @@ fun FilamentNfcScreen(
         }
 
         nfcAdapter?.enableReaderMode(
-            context as android.app.Activity,
+            context as Activity,
             nfcCallback,
             NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B,
             null
         )
 
         onDispose {
-            nfcAdapter?.disableReaderMode(context as android.app.Activity)
+            nfcAdapter?.disableReaderMode(context as Activity)
         }
     }
 
@@ -93,12 +106,12 @@ fun FilamentNfcScreen(
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_info),
-                            contentDescription = "Info",
+                            contentDescription = stringResource(R.string.info),
                             Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "Filament Info",
+                            text = stringResource(R.string.info),
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -118,14 +131,12 @@ fun FilamentNfcScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
-                                contentDescription = "Filamenty",
-                                tint = Color.Gray,
+                                contentDescription = stringResource(R.string.filaments),
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(48.dp),
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                     NavigationBarItem(
                         selected = true,
@@ -133,13 +144,11 @@ fun FilamentNfcScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
-                                contentDescription = "Info",
+                                contentDescription = stringResource(R.string.info),
                                 modifier = Modifier.size(48.dp)
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                     NavigationBarItem(
                         selected = false,
@@ -147,14 +156,12 @@ fun FilamentNfcScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
-                                contentDescription = "Tlačiť",
-                                tint = Color.Gray,
+                                contentDescription = stringResource(R.string.print),
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
                 }
             }
@@ -169,23 +176,23 @@ fun FilamentNfcScreen(
         ) {
             Image(
                 painter = painterResource(R.drawable.nfc),
-                contentDescription = "NFC Icon",
+                contentDescription = stringResource(R.string.nfc),
                 modifier = Modifier
                     .size(200.dp)
                     .padding(16.dp)
             )
 
             Text(
-                text = "Place device close to tag",
+                text = stringResource(R.string.place_device_close_to_tag),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray
+                color = colorResource(R.color.gray)
             )
 
             if (mode == FilamentNfcScreenMode.READ) {
                 Text(
-                    text = "or",
+                    text = stringResource(R.string.or),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = colorResource(R.color.gray)
                 )
 
                 Spacer(modifier = Modifier.height(40.dp))
@@ -193,16 +200,16 @@ fun FilamentNfcScreen(
                 OutlinedTextField(
                     value = nfcId,
                     onValueChange = { nfcId = it },
-                    label = { Text("Enter ID manually", color = darkGrayColor) },
+                    label = { Text(stringResource(R.string.enter_id_manually), color = colorResource(R.color.dark_gray)) },
                     modifier = Modifier
                         .width(280.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = lightGrayColor,
-                        unfocusedBorderColor = lightGrayColor,
-                        cursorColor = lightGrayColor,
-                        unfocusedLabelColor = lightGrayColor,
-                        focusedLabelColor = lightGrayColor,
+                        focusedBorderColor = colorResource(R.color.light_gray),
+                        unfocusedBorderColor = colorResource(R.color.light_gray),
+                        cursorColor = colorResource(R.color.light_gray),
+                        unfocusedLabelColor = colorResource(R.color.light_gray),
+                        focusedLabelColor = colorResource(R.color.light_gray),
                     )
                 )
 
@@ -217,7 +224,7 @@ fun FilamentNfcScreen(
                                 if (success) {
                                     navController.navigate("filamentView/$nfcId")
                                 } else {
-                                    errorMessage = "Filament not found"
+                                    errorMessage = error2
                                 }
                             }
                         }
@@ -228,18 +235,18 @@ fun FilamentNfcScreen(
                         .width(280.dp),
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = lightGrayColor,
-                        contentColor = darkGrayColor
+                        containerColor = colorResource(R.color.light_gray),
+                        contentColor = colorResource(R.color.dark_gray)
                     )
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
-                            color = Color.White,
+                            color = colorResource(R.color.white),
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("Continue")
+                        Text(stringResource(R.string.submit))
                     }
                 }
             }
@@ -247,7 +254,7 @@ fun FilamentNfcScreen(
             if (errorMessage.isNotEmpty()) {
                 Text(
                     text = errorMessage,
-                    color = Color.Red,
+                    color = colorResource(R.color.red),
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
@@ -257,6 +264,7 @@ fun FilamentNfcScreen(
 
 fun readNfcTag(
     tag: Tag?,
+    error1: String,
     onNfcRead: (String) -> Unit,
     onError: (String) -> Unit
 ) {
@@ -272,7 +280,7 @@ fun readNfcTag(
                 onNfcRead(nfcId)
             }
         } catch (e: Exception) {
-            onError("Error reading NFC tag: ${e.message}")
+            onError(error1 + e.message)
         } finally {
             ndef?.close()
         }
@@ -282,6 +290,7 @@ fun readNfcTag(
 fun updateNfcTag(
     filamentId: String,
     tag: Tag?,
+    errors: List<String>,
     filamentViewModel: FilamentViewModel,
     onSuccess: () -> Unit,
     onError: (String) -> Unit
@@ -294,14 +303,14 @@ fun updateNfcTag(
             if (ndef != null) {
                 // Make sure the tag is writable
                 if (!ndef.isWritable) {
-                    onError("NFC tag is not writable")
+                    onError(errors[0])
                     return
                 }
 
                 // Get max size
                 val maxSize = ndef.maxSize
                 if (filamentId.length > maxSize) {
-                    onError("Data too large for NFC tag")
+                    onError(errors[1])
                     return
                 }
 
@@ -314,16 +323,16 @@ fun updateNfcTag(
 
                 onSuccess()
             } else {
-                onError("Tag doesn't support NDEF")
+                onError(errors[2])
             }
         } catch (e: Exception) {
-            onError("Error updating NFC tag: ${e.message}")
+            onError(errors[3] + e.message)
         } finally {
             try {
                 Ndef.get(tag)?.close()
             } catch (e: Exception) { }
         }
-    } ?: onError("Tag is null")
+    } ?: onError(errors[4])
 }
 
 enum class FilamentNfcScreenMode {
