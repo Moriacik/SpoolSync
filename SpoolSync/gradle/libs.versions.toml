@@ -17,7 +17,8 @@ googleMlKitTextRecognition = "16.0.1"
 navigationRuntimeKtx = "2.8.9"
 navigationCompose = "2.8.9"
 media3CommonKtx = "1.6.0"
-colorpicker = "0.7.0"
+colorPicker = "0.7.0"
+androidWork = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,8 +45,9 @@ firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-k
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 google-mlkit-textrecognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "googleMlKitTextRecognition" }
-godaddy-android-colorpicker = { group = "com.godaddy.android.colorpicker", name = "compose-color-picker", version.ref = "colorpicker" }
-godaddy-android-colorpicker-android = { group = "com.godaddy.android.colorpicker", name = "compose-color-picker-android", version.ref = "colorpicker" }
+godaddy-android-colorpicker = { group = "com.godaddy.android.colorpicker", name = "compose-color-picker", version.ref = "colorPicker" }
+godaddy-android-colorpicker-android = { group = "com.godaddy.android.colorpicker", name = "compose-color-picker-android", version.ref = "colorPicker" }
+androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidWork" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

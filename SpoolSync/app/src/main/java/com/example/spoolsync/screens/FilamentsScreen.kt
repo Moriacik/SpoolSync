@@ -1,5 +1,6 @@
 package com.example.spoolsync.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,9 +17,14 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -30,6 +36,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.spoolsync.viewModels.FilamentViewModel
 import com.example.spoolsync.R
+import java.time.LocalDate
+import kotlin.collections.get
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +45,9 @@ fun FilamentsScreen(
     navController: NavController,
     filamentViewModel: FilamentViewModel = viewModel()
 ) {
+    var selectedCategory by remember { mutableStateOf("") }
+    val filamentStatuses = stringArrayResource(R.array.filament_status_options)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -136,7 +147,13 @@ fun FilamentsScreen(
             LazyColumn(
                 modifier = Modifier.weight(1f)
             ) {
-                items(filamentViewModel.filaments) { filament ->
+                val filteredFilaments = if (selectedCategory.isEmpty()) {
+                    filamentViewModel.filaments
+                } else {
+                    filamentViewModel.filaments.filter { it.status == selectedCategory }
+                }
+
+                items(filteredFilaments) { filament ->
                     FilamentItem(filament, navController)
                     Divider(color = colorResource(R.color.light_gray))
                 }
@@ -152,8 +169,12 @@ fun FilamentsScreen(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(listOf(R.drawable.ic_filament, R.drawable.ic_printer , R.drawable.ic_box_closed, R.drawable.ic_box_opened)) { imageResource ->
-                    CategoryChip(imageResource = imageResource)
+                items(listOf(R.drawable.ic_filament, R.drawable.ic_printer, R.drawable.ic_box_closed, R.drawable.ic_box_opened)) { imageResource ->
+                    CategoryChip(imageResource,
+                        filamentStatuses,
+                        selectedCategory,
+                        onCategorySelected = { category -> selectedCategory = category }
+                    )
                 }
             }
         }
@@ -161,7 +182,22 @@ fun FilamentsScreen(
 }
 
 @Composable
-fun CategoryChip(imageResource: Int) {
+fun CategoryChip(
+    imageResource: Int,
+    filamentStatuses: Array<String>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    val category = when (imageResource) {
+        R.drawable.ic_filament -> ""
+        R.drawable.ic_printer -> filamentStatuses[0]
+        R.drawable.ic_box_closed -> filamentStatuses[1]
+        R.drawable.ic_box_opened -> filamentStatuses[2]
+        else -> ""
+    }
+
+    val isSelected = category == selectedCategory
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(4.dp)
@@ -169,7 +205,16 @@ fun CategoryChip(imageResource: Int) {
         Box(
             modifier = Modifier
                 .size(96.dp)
-                .background(color = colorResource(R.color.light_gray), shape = RoundedCornerShape(12.dp)),
+                .background(
+                    color = colorResource(R.color.light_gray),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .border(
+                    width = if (isSelected) 2.dp else 0.dp,
+                    color = colorResource(R.color.dark_gray),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .clickable { onCategorySelected(category) },
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -182,9 +227,9 @@ fun CategoryChip(imageResource: Int) {
         Text(
             text = when (imageResource) {
                 R.drawable.ic_filament -> stringResource(R.string.all)
-                R.drawable.ic_printer -> stringArrayResource(R.array.filament_status_options)[0]
-                R.drawable.ic_box_closed -> stringArrayResource(R.array.filament_status_options)[1]
-                R.drawable.ic_box_opened -> stringArrayResource(R.array.filament_status_options)[2]
+                R.drawable.ic_printer -> filamentStatuses[0]
+                R.drawable.ic_box_closed -> filamentStatuses[1]
+                R.drawable.ic_box_opened -> filamentStatuses[2]
                 else -> ""
             },
             style = MaterialTheme.typography.bodyLarge,
@@ -207,7 +252,7 @@ fun FilamentItem(filament: Filament, navController: NavController) {
             modifier = Modifier
                 .size(50.dp)
                 .border(2.dp, colorResource(R.color.dark_gray), CircleShape)
-                .background(Color(filament.color.toColorInt()), shape = CircleShape)
+                .background(Color(filament.color.toArgb()), shape = CircleShape)
         )
 
         Column(
@@ -230,7 +275,7 @@ fun FilamentItem(filament: Filament, navController: NavController) {
             horizontalAlignment = Alignment.End
         ) {
             Text(
-                text = filament.weight,
+                text = filament.weight.toString(),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -246,10 +291,10 @@ data class Filament(
     val id: String,
     val type: String,
     val brand: String,
-    val weight: String,
+    val weight: Int,
     val status: String,
-    val color: String,
-    val expirationDate: String,
-    val activeNfc: String,
+    val color: Color,
+    val expirationDate: LocalDate,
+    val activeNfc: Boolean,
     val note: String
 )

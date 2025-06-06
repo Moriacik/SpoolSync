@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -38,6 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.example.spoolsync.viewModels.FilamentViewModel
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import kotlin.toString
 
 enum class FilamentFormMode {
     VIEW, ADD, EDIT
@@ -51,8 +55,9 @@ fun FilamentFormScreen(
     initialFilament: Filament? = null,
     filamentViewModel: FilamentViewModel
 ) {
-    var filament by remember { mutableStateOf(initialFilament ?: Filament("", "", "", "", "", "#ffffffff", "", "false", "")) }
-    val originalFilament = remember { initialFilament ?: Filament("", "", "", "", "", "#ffffffff", "", "false", "") }
+    var defaultColor = colorResource(R.color.default_color)
+    var filament by remember { mutableStateOf(initialFilament ?: Filament("", "", "", 0, "", defaultColor, LocalDate.now(), true, "")) }
+    val originalFilament = remember { initialFilament ?: Filament("", "", "", 0, "", defaultColor, LocalDate.now(), true, "") }
     var isEditing by remember { mutableStateOf(mode == EDIT || mode == ADD) }
 
     Scaffold(
@@ -323,11 +328,37 @@ fun FilamentFormScreen(
                         Text(
                             text = filament.note,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = colorResource(R.color.gray),
+                            color = colorResource(R.color.black),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(8.dp)
                         )
+                    }
+
+                    Divider(modifier = Modifier.padding(4.dp, 12.dp))
+
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        Button(
+                            onClick = {
+                                filamentViewModel.deleteFilament(filament.id)
+                                navController.popBackStack()
+                            },
+                            modifier = Modifier
+                                .height(50.dp)
+                                .width(280.dp),
+                            shape = RoundedCornerShape(25.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorResource(R.color.red),
+                                contentColor = colorResource(R.color.light_gray)
+                            )
+                        ) {
+                            Text(stringResource(R.string.delete_filament))
+                        }
                     }
                 }
             }
@@ -378,8 +409,7 @@ private fun EditableFilamentForm(
             value = filament.expirationDate,
             id = filament.id,
             onValueChange = { onFilamentChange(filament.copy(expirationDate = it)) },
-            inputType = InputType.DROPDOWN,
-            options = stringArrayResource(R.array.filament_expiration_options).toList(),
+            inputType = InputType.DATE_PICKER,
             navController = navController,
             isEditable = true
         )
@@ -390,7 +420,7 @@ private fun EditableFilamentForm(
             icon = painterResource(R.drawable.ic_nfc),
             value = filament.activeNfc,
             id = filament.id,
-            onValueChange = { onFilamentChange(filament.copy(note = it)) },
+            onValueChange = { onFilamentChange(filament.copy(activeNfc = it)) },
             inputType = InputType.NFC_FIELD,
             navController = navController,
             isEditable = true
@@ -406,7 +436,7 @@ private fun FilamentInfoDisplay(
     Column {
         FormWithIcon(
             icon = painterResource(R.drawable.ic_collor),
-            value = filament.color.ifEmpty { stringResource(R.string.not_specified) },
+            value = filament.color,
             id = filament.id,
             onValueChange = {},
             inputType = InputType.COLOR_PICKER,
@@ -416,7 +446,7 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_weight),
-            value = filament.weight.ifEmpty { stringResource(R.string.not_specified) },
+            value = filament.weight,
             id = filament.id,
             onValueChange = {},
             inputType = InputType.WEIGHT_FIELD,
@@ -436,10 +466,10 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_expiration),
-            value = filament.expirationDate.ifEmpty { stringResource(R.string.not_specified) },
+            value = filament.expirationDate,
             id = filament.id,
-            onValueChange = {},
-            inputType = InputType.TEXT,
+            onValueChange = { },
+            inputType = InputType.DATE_PICKER,
             navController = navController,
             isEditable = false
         )
@@ -448,7 +478,7 @@ private fun FilamentInfoDisplay(
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_nfc),
-            value = filament.activeNfc.ifEmpty { stringResource(R.string.not_specified) },
+            value = filament.activeNfc,
             id = filament.id,
             onValueChange = {},
             inputType = InputType.NFC_FIELD,
@@ -459,11 +489,11 @@ private fun FilamentInfoDisplay(
 }
 
 @Composable
-fun FormWithIcon(
+fun <T> FormWithIcon(
     icon: Painter,
-    value: String,
+    value: T,
     id: String,
-    onValueChange: (String) -> Unit,
+    onValueChange: (T) -> Unit,
     inputType: InputType,
     options: List<String> = emptyList(),
     navController: NavController,
@@ -487,30 +517,34 @@ fun FormWithIcon(
             Column(modifier = Modifier.weight(1f)) {
                 when (inputType) {
                     InputType.TEXT -> BasicTextField(
-                        value = value,
-                        onValueChange = onValueChange,
+                        value = value.toString(),
+                        onValueChange = { onValueChange(it as T) },
                         textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
                     )
+
                     InputType.WEIGHT_FIELD -> WeightInputField(
-                        weight = value,
-                        onWeightChange = onValueChange
+                        weight = value.toString(),
+                        onWeightChange = { onValueChange(it as T) }
                     )
 
                     InputType.DROPDOWN -> DropdownField(
                         options = options,
-                        selectedOption = value,
-                        onOptionSelected = onValueChange
+                        selectedOption = value.toString(),
+                        onOptionSelected = { onValueChange(it as T) }
                     )
 
-                    InputType.COLOR_PICKER -> {
-                        ColorPicker(
-                            selectedColor = Color(android.graphics.Color.parseColor(value)),
-                            onColorSelected = { onValueChange("#${Integer.toHexString(it.toArgb())}") }
-                        )
-                    }
+                    InputType.DATE_PICKER -> DatePicker(
+                        selectedDate = value as LocalDate,
+                        onDateSelected = { onValueChange(it as T) }
+                    )
+
+                    InputType.COLOR_PICKER -> ColorPicker(
+                        selectedColor = value as Color,
+                        onColorSelected = { onValueChange(it as T) }
+                    )
 
                     InputType.NFC_FIELD -> {
                         Row(
@@ -520,8 +554,8 @@ fun FormWithIcon(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = if (value == "true") stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
-                                style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") colorResource(R.color.green) else colorResource(R.color.red)),
+                                text = if (value != true) stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
+                                style = MaterialTheme.typography.bodyLarge.copy(color = if (value != true) colorResource(R.color.green) else colorResource(R.color.red)),
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(8.dp)
@@ -542,13 +576,12 @@ fun FormWithIcon(
             }
         } else {
             when (inputType) {
-                InputType.COLOR_PICKER ->
-                    Box(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .background(Color(android.graphics.Color.parseColor(value)), CircleShape)
-                            .border(2.dp, colorResource(R.color.dark_gray), CircleShape)
-                    )
+                InputType.COLOR_PICKER -> Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .background(value as Color, CircleShape)
+                        .border(2.dp, colorResource(R.color.dark_gray), CircleShape)
+                )
 
                 InputType.WEIGHT_FIELD -> Text(
                     text = "$value g",
@@ -557,13 +590,13 @@ fun FormWithIcon(
                 )
 
                 InputType.NFC_FIELD -> Text(
-                    text = if (value == "true") stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = if (value == "true") colorResource(R.color.green) else colorResource(R.color.red)),
+                    text = if (value != true) stringResource(R.string.scanned) else stringResource(R.string.not_scanned),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = if (value != true) colorResource(R.color.green) else colorResource(R.color.red)),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 else -> Text(
-                    text = value.ifEmpty { stringResource(R.string.not_specified) },
+                    text = value.toString().ifEmpty { stringResource(R.string.not_specified) },
                     style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -573,24 +606,30 @@ fun FormWithIcon(
 }
 
 enum class InputType {
-    TEXT, WEIGHT_FIELD, DROPDOWN, COLOR_PICKER, NFC_FIELD
+    TEXT, WEIGHT_FIELD, DROPDOWN, DATE_PICKER, COLOR_PICKER, NFC_FIELD
 }
 
 @Composable
 fun WeightInputField(
     weight: String,
-    onWeightChange: (String) -> Unit
+    onWeightChange: (Int) -> Unit
 ) {
     var inputWeight by remember { mutableStateOf(weight) }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(end = 12.dp)
+            .background(colorResource(R.color.light_gray), RoundedCornerShape(10.dp))
+    ) {
         TextField(
             value = inputWeight,
             placeholder = { Text(stringResource(R.string.weight_in_grams), color = colorResource(R.color.gray)) },
             onValueChange = { newValue ->
                 val numericValue = newValue.filter { it.isDigit() }
                 inputWeight = numericValue
-                onWeightChange(numericValue)
+                onWeightChange(numericValue.toIntOrNull() ?: 0)
             },
             textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
             colors = TextFieldDefaults.colors(
@@ -602,7 +641,6 @@ fun WeightInputField(
                 unfocusedTextColor = colorResource(R.color.black)
             ),
             modifier = Modifier
-                .padding(8.dp)
                 .weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -612,7 +650,7 @@ fun WeightInputField(
         Text(
             text = "g",
             style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.gray)),
-            modifier = Modifier.padding(end = 10.dp)
+            modifier = Modifier.padding(end = 12.dp)
         )
     }
 }
@@ -712,6 +750,66 @@ fun ColorPicker(
                     }
                 }
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePicker(
+    selectedDate: LocalDate,
+    onDateSelected: (LocalDate) -> Unit
+) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp)
+            .padding(end = 12.dp)
+            .background(colorResource(R.color.light_gray), RoundedCornerShape(10.dp))
+    ){
+        Text(
+            text = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showDatePicker = true }
+                .padding(start = 12.dp),
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = selectedDate
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            )
+
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let {
+                                val newDate = Instant.ofEpochMilli(it)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                                onDateSelected(newDate)
+                            }
+                            showDatePicker = false
+                        }
+                    ) { Text(stringResource(R.string.submit)) }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
         }
     }
 }

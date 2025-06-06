@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.godaddy.android.colorpicker)
     implementation(libs.godaddy.android.colorpicker.android)
+    implementation(libs.androidx.work)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

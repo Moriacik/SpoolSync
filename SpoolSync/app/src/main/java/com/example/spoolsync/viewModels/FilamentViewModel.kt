@@ -2,18 +2,20 @@ package com.example.spoolsync.viewModels
 
 import android.app.Application
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.AndroidViewModel
+import com.example.spoolsync.notification.Notification
 import com.example.spoolsync.screens.Filament
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDate
 import java.util.UUID
-import kotlin.text.get
 
 class FilamentViewModel(application: Application) : AndroidViewModel(application) {
     private val db: FirebaseFirestore = Firebase.firestore
@@ -26,6 +28,7 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
         loadFilaments()
     }
 
+
     fun loadFilaments() {
         db.collection("users").document(userId)
             .addSnapshotListener { snapshot, error ->
@@ -37,38 +40,49 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
                 filaments.clear()
                 val userFilaments = snapshot?.get("filaments") as? List<Map<String, Any>>
                 userFilaments?.forEach { data ->
-                    filaments.add(
-                        Filament(
-                            id = data["id"] as? String ?: "",
-                            type = data["type"] as? String ?: "",
-                            brand = data["brand"] as? String ?: "",
-                            weight = data["weight"] as? String ?: "",
-                            status = data["status"] as? String ?: "",
-                            color = data["color"] as? String ?: "",
-                            expirationDate = data["expirationDate"] as? String ?: "",
-                            activeNfc = data["activeNfc"] as? String ?: "",
-                            note = data["note"] as? String ?: ""
+                    try {
+                        filaments.add(
+                            Filament(
+                                id = data["id"] as? String ?: "",
+                                type = data["type"] as? String ?: "",
+                                brand = data["brand"] as? String ?: "",
+                                weight = (data["weight"] as? Number)?.toInt() ?: 0,
+                                status = data["status"] as? String ?: "",
+                                color = Color(android.graphics.Color.parseColor(data["color"] as? String ?: "#000000")),
+                                expirationDate = (data["expirationDate"] as? String).let { LocalDate.parse(it) },
+                                activeNfc = (data["activeNfc"] as? Boolean) == false,
+                                note = data["note"] as? String ?: ""
+                            )
                         )
-                    )
+                    } catch (e: Exception) {
+                        Log.e("FilamentViewModel", "Error parsing filament: ${e.message}")
+                    }
                 }
             }
     }
 
     fun saveNewFilament(filament: Filament) {
-        val newFilament = Filament(
-            id = UUID.randomUUID().toString(),
-            type = filament.type,
-            brand = filament.brand,
-            weight = filament.weight,
-            status = filament.status,
-            color = filament.color,
-            expirationDate = filament.expirationDate,
-            activeNfc = filament.activeNfc,
-            note = filament.note
+        val newFilament = mapOf(
+           "id" to  UUID.randomUUID().toString(),
+            "type" to filament.type,
+            "brand" to filament.brand,
+            "weight" to filament.weight,
+            "status" to filament.status,
+            "color" to String.format("#%08X", filament.color.toArgb()),
+            "expirationDate" to filament.expirationDate?.toString(),
+            "activeNfc" to filament.activeNfc,
+            "note" to filament.note
         )
 
         db.collection("users").document(userId)
             .update("filaments", FieldValue.arrayUnion(newFilament))
+
+        Notification.scheduleNotification(
+            getApplication<Application>().applicationContext,
+            filament.id,
+            filament.type,
+            filament.expirationDate
+        )
     }
 
     fun saveExistfilament(filament: Filament) {
@@ -110,11 +124,11 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
                             id = matchingFilament["id"] as? String ?: "",
                             type = matchingFilament["type"] as? String ?: "",
                             brand = matchingFilament["brand"] as? String ?: "",
-                            weight = matchingFilament["weight"] as? String ?: "",
+                            weight = (matchingFilament["weight"] as? Number)?.toInt() ?: 0,
                             status = matchingFilament["status"] as? String ?: "",
-                            color = matchingFilament["color"] as? String ?: "",
-                            expirationDate = matchingFilament["expirationDate"] as? String ?: "",
-                            activeNfc = matchingFilament["activeNfc"] as? String ?: "",
+                            color = Color(android.graphics.Color.parseColor(matchingFilament["color"] as? String ?: "#000000")),
+                            expirationDate = (matchingFilament["expirationDate"] as? String).let { LocalDate.parse(it) },
+                            activeNfc = (matchingFilament["activeNfc"] as? Boolean) == false,
                             note = matchingFilament["note"] as? String ?: ""
                         )
                         callback(true)
@@ -147,6 +161,21 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
 
                 db.collection("users").document(userId)
                     .update("filaments", updatedFilaments)
+            }
+    }
+
+    fun deleteFilament(filamentId: String) {
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val userFilaments = document.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+                val filamentToDelete = userFilaments.find { it["id"] == filamentId }
+
+                db.collection("users").document(userId)
+                    .update("filaments", FieldValue.arrayRemove(filamentToDelete))
+                    .addOnSuccessListener {
+                        loadFilaments()
+                    }
             }
     }
 }
