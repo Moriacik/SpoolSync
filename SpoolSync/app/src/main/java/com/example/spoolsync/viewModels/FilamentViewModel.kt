@@ -164,6 +164,26 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
+    fun updateFilamentWeight(filamentId: String, newWeight: Int) {
+        db.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val userFilaments = document.get("filaments") as? MutableList<Map<String, Any>> ?: mutableListOf()
+                val updatedFilaments = userFilaments.map { existingFilament ->
+                    if (existingFilament["id"] == filamentId) {
+                        existingFilament.toMutableMap().apply {
+                            this["weight"] = newWeight
+                        }
+                    } else {
+                        existingFilament
+                    }
+                }
+
+                db.collection("users").document(userId)
+                    .update("filaments", updatedFilaments)
+            }
+    }
+
     fun deleteFilament(filamentId: String) {
         db.collection("users").document(userId)
             .get()

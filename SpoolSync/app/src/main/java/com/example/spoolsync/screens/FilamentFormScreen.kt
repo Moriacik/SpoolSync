@@ -293,6 +293,7 @@ fun FilamentFormScreen(
                                     filamentViewModel.saveExistfilament(filament)
                                 }
                             },
+                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(Icons.Default.Check, contentDescription = stringResource(R.string.submit))
@@ -310,8 +311,8 @@ fun FilamentFormScreen(
                                     filament = originalFilament
                                 }
                             },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray))
+                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.red)),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
                             Text(stringResource(R.string.cancel))
@@ -354,7 +355,7 @@ fun FilamentFormScreen(
                             shape = RoundedCornerShape(25.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = colorResource(R.color.red),
-                                contentColor = colorResource(R.color.light_gray)
+                                contentColor = colorResource(R.color.white)
                             )
                         ) {
                             Text(stringResource(R.string.delete_filament))

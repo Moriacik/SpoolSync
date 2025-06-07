@@ -27,7 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spoolsync.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.text.set
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,11 +61,39 @@ fun FilamentNfcScreen(
     DisposableEffect(Unit) {
         val nfcCallback = object : NfcAdapter.ReaderCallback {
             override fun onTagDiscovered(tag: Tag?) {
-                if (mode == FilamentNfcScreenMode.READ) {
+                if (mode == FilamentNfcScreenMode.OCR) {
                     readNfcTag(
                         tag,
                         error1,
-                        { id -> nfcId = id },
+                        { id ->
+                            coroutineScope.launch {
+                                withContext(Dispatchers.Main) {
+                                    nfcId = id
+                                    navController.previousBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.set("filamentId", id)
+                                    navController.popBackStack()
+                                }
+                            }
+                        },
+                        { error -> errorMessage = error }
+                    )
+                } else if (mode == FilamentNfcScreenMode.READ) {
+                    readNfcTag(
+                        tag,
+                        error1,
+                        { id ->
+                            nfcId = id
+                            coroutineScope.launch {
+                                filamentViewModel.loadFilamentById(nfcId) { success ->
+                                    if (success) {
+                                        navController.navigate("filamentView/$nfcId")
+                                    } else {
+                                        errorMessage = error2
+                                    }
+                                }
+                            }
+                        },
                         { error -> errorMessage = error }
                     )
                 } else if (mode == FilamentNfcScreenMode.UPDATE && filamentId != null) {
@@ -336,5 +367,5 @@ fun updateNfcTag(
 }
 
 enum class FilamentNfcScreenMode {
-    READ, UPDATE
+    READ, UPDATE, OCR
 }

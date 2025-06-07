@@ -17,14 +17,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +39,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,31 +51,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
 import androidx.core.net.toUri
+import com.example.spoolsync.screens.FilamentFormMode.ADD
+import com.example.spoolsync.viewModels.FilamentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrintScreen(
     navController: NavController,
-    imageUri: String
+    filamentViewModel: FilamentViewModel,
+    imageUri: String,
+    filament: Filament? = null,
+    scannedWeight: String
 ) {
     val context = LocalContext.current
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-    var filamentWeight by remember { mutableStateOf("") }
-    var newWeight by remember { mutableStateOf("") }
+    var scannedWeightState by remember { mutableStateOf(scannedWeight) }
+    val scannedRoundedWeight = scannedWeightState.toFloatOrNull()?.toInt() ?: 0
+    val newWeight = filament?.weight?.minus(scannedRoundedWeight) ?: 0
 
     LaunchedEffect(imageUri) {
         try {
             val inputStream = context.contentResolver.openInputStream(imageUri.toUri())
             selectedImage = BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -157,15 +172,16 @@ fun PrintScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(32.dp)
         ) {
-            // Image Box
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(300.dp)
                         .padding(16.dp)
@@ -173,7 +189,82 @@ fun PrintScreen(
                         .border(2.dp, Color.LightGray)
                 ) {
                     selectedImage?.let {
-                        Image(bitmap = it.asImageBitmap(), contentDescription = "Selected Image")
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp, 60.dp)
+                            .background(Color.Transparent)
+                    ) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .width(20.dp)
+                                .align(Alignment.TopStart),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .width(20.dp)
+                                .align(Alignment.TopEnd),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .width(20.dp)
+                                .align(Alignment.BottomStart),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .width(20.dp)
+                                .align(Alignment.BottomEnd),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        VerticalDivider(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .align(Alignment.TopStart),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        VerticalDivider(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .align(Alignment.TopEnd),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        VerticalDivider(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .align(Alignment.BottomStart),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
+
+                        VerticalDivider(
+                            modifier = Modifier
+                                .height(20.dp)
+                                .align(Alignment.BottomEnd),
+                            thickness = 4.dp,
+                            color = Color.LightGray
+                        )
                     }
                 }
             }
@@ -188,9 +279,31 @@ fun PrintScreen(
             )
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = filament?.type ?: "",
+                    fontSize = 40.sp,
+                    modifier = Modifier
+                            .weight(1f)
+                )
+                Text(
+                    text = filament?.brand ?: "",
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp)
+                )
+            }
+
             FormWithIcon(
                 icon = painterResource(R.drawable.ic_collor),
-                value = "Color: #FFFFFF",
+                value = filament?.color,
                 id = "",
                 onValueChange = {},
                 inputType = InputType.TEXT,
@@ -199,18 +312,8 @@ fun PrintScreen(
             )
 
             FormWithIcon(
-                icon = painterResource(R.drawable.ic_weight),
-                value = filamentWeight.ifEmpty { "Weight: Not specified" },
-                id = "",
-                onValueChange = { filamentWeight = it },
-                inputType = InputType.WEIGHT_FIELD,
-                navController = navController,
-                isEditable = true
-            )
-
-            FormWithIcon(
                 icon = painterResource(R.drawable.ic_status),
-                value = "Status: Open",
+                value = filament?.status,
                 id = "",
                 onValueChange = {},
                 inputType = InputType.TEXT,
@@ -220,37 +323,82 @@ fun PrintScreen(
 
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
-            // Weight Calculation
             Text(
                 text = "Calculate New Weight",
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                TextField(
-                    value = newWeight,
-                    onValueChange = { newWeight = it },
-                    placeholder = { Text("Enter new weight", color = Color.Gray) },
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = { /* Perform weight calculation */ },
-                    modifier = Modifier.padding(end = 10.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 ) {
-                    Text("Calculate")
+                    Text(
+                        text = "Actual Weight:",
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "${filament?.weight} g",
+                        modifier = Modifier.padding(end = 20.dp)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "Scanned Weight:",
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextField(
+                        value = scannedWeightState,
+                        onValueChange = { scannedWeightState = it },
+                        singleLine = true,
+                        modifier = Modifier
+                            .width(120.dp)
+                            .padding(end = 20.dp),
+                    )
+                    Text(
+                        text = "(${scannedRoundedWeight}) g",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(end = 20.dp)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "New Weight:",
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "$newWeight g",
+                        modifier = Modifier.padding(end = 20.dp)
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {
+                            filamentViewModel.updateFilamentWeight(
+                                filamentId = filament?.id.toString(),
+                                newWeight = newWeight
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .width(250.dp)
+                    ) {
+                        Text("Print")
+                    }
                 }
             }
         }

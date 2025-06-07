@@ -78,6 +78,15 @@ fun SpoolSyncApp() {
             )
         }
 
+        composable("filamentNfcReadOcr") {
+            FilamentNfcScreen(
+                navController,
+                filamentViewModel,
+                FilamentNfcScreenMode.OCR,
+                null
+            )
+        }
+
         composable("filamentNfcUpdate/{filamentId}",
             arguments = listOf(navArgument("filamentId") { type = NavType.StringType })
         ) { backStackEntry ->
@@ -94,11 +103,23 @@ fun SpoolSyncApp() {
             OcrScreen(navController)
         }
 
-        composable("print/{imageUri}",
-            arguments = listOf(navArgument("imageUri") { type = NavType.StringType })
+        composable("print/{imageUri}/{filamentId}/{scannedWeight}",
+            arguments = listOf(
+                navArgument("imageUri") { type = NavType.StringType },
+                navArgument("filamentId") { type = NavType.StringType },
+                navArgument("scannedWeight") { type = NavType.StringType }
+            )
         ) { backStackEntry ->
             val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
-            PrintScreen(navController, imageUri)
+            val filamentId = backStackEntry.arguments?.getString("filamentId") ?: ""
+            val scannedWeight = backStackEntry.arguments?.getString("scannedWeight") ?: ""
+            PrintScreen(
+                navController,
+                filamentViewModel,
+                imageUri,
+                filament = filamentViewModel.filaments.find { it.id == filamentId },
+                scannedWeight
+            )
         }
     }
 }
