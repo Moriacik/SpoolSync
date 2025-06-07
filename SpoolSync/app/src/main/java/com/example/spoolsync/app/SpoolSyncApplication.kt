@@ -1,4 +1,4 @@
-package com.example.spoolsync
+package com.example.spoolsync.app
 
 import android.app.Application
 import com.google.firebase.ktx.Firebase

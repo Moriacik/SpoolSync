@@ -1,8 +1,7 @@
-package com.example.spoolsync.screens
+package com.example.spoolsync.ui.screens
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,12 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,7 +26,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -57,14 +51,17 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
 import androidx.core.net.toUri
-import com.example.spoolsync.screens.FilamentFormMode.ADD
-import com.example.spoolsync.viewModels.FilamentViewModel
+import com.example.spoolsync.data.model.Filament
+import com.example.spoolsync.ui.components.FormWithIcon
+import com.example.spoolsync.ui.components.InputType
+import com.example.spoolsync.ui.viewModels.FilamentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,10 +73,12 @@ fun PrintScreen(
     scannedWeight: String
 ) {
     val context = LocalContext.current
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     var scannedWeightState by remember { mutableStateOf(scannedWeight) }
     val scannedRoundedWeight = scannedWeightState.toFloatOrNull()?.toInt() ?: 0
     val newWeight = filament?.weight?.minus(scannedRoundedWeight) ?: 0
+    val error1 = stringResource(R.string.negative_weight)
 
     LaunchedEffect(imageUri) {
         try {
@@ -92,24 +91,15 @@ fun PrintScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Print", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigate("filaments") }) {
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Account")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Notification action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications")
-                    }
-                    IconButton(onClick = { /* Settings action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings")
+                            painter = painterResource(R.drawable.ic_printer),
+                            contentDescription = stringResource(R.string.print),
+                            Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = stringResource(R.string.print), fontWeight = FontWeight.Bold)
                     }
                 }
             )
@@ -127,7 +117,7 @@ fun PrintScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
-                                contentDescription = "Filamenty",
+                                contentDescription = stringResource(R.string.filaments),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(48.dp),
                             )
@@ -142,7 +132,7 @@ fun PrintScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
-                                contentDescription = "Info",
+                                contentDescription = stringResource(R.string.info),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -157,7 +147,7 @@ fun PrintScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
-                                contentDescription = "Tlačiť",
+                                contentDescription = stringResource(R.string.print),
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -191,7 +181,7 @@ fun PrintScreen(
                     selectedImage?.let {
                         Image(
                             bitmap = it.asImageBitmap(),
-                            contentDescription = "Selected Image",
+                            contentDescription = stringResource(R.string.selected_image),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
@@ -207,7 +197,7 @@ fun PrintScreen(
                                 .width(20.dp)
                                 .align(Alignment.TopStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         HorizontalDivider(
@@ -215,7 +205,7 @@ fun PrintScreen(
                                 .width(20.dp)
                                 .align(Alignment.TopEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         HorizontalDivider(
@@ -223,7 +213,7 @@ fun PrintScreen(
                                 .width(20.dp)
                                 .align(Alignment.BottomStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         HorizontalDivider(
@@ -231,7 +221,7 @@ fun PrintScreen(
                                 .width(20.dp)
                                 .align(Alignment.BottomEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -239,7 +229,7 @@ fun PrintScreen(
                                 .height(20.dp)
                                 .align(Alignment.TopStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -247,7 +237,7 @@ fun PrintScreen(
                                 .height(20.dp)
                                 .align(Alignment.TopEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -255,7 +245,7 @@ fun PrintScreen(
                                 .height(20.dp)
                                 .align(Alignment.BottomStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -263,7 +253,7 @@ fun PrintScreen(
                                 .height(20.dp)
                                 .align(Alignment.BottomEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
                     }
                 }
@@ -273,7 +263,7 @@ fun PrintScreen(
 
             // Filament Information
             Text(
-                text = "Filament Information",
+                text = stringResource(R.string.filament_information),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -306,7 +296,7 @@ fun PrintScreen(
                 value = filament?.color,
                 id = "",
                 onValueChange = {},
-                inputType = InputType.TEXT,
+                inputType = InputType.COLOR_PICKER,
                 navController = navController,
                 isEditable = false
             )
@@ -324,7 +314,7 @@ fun PrintScreen(
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
             Text(
-                text = "Calculate New Weight",
+                text = stringResource(R.string.calculate_new_weight),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -336,7 +326,7 @@ fun PrintScreen(
                     modifier = Modifier.padding(vertical = 4.dp)
                 ) {
                     Text(
-                        text = "Actual Weight:",
+                        text = stringResource(R.string.actual_weight),
                         modifier = Modifier.weight(1f)
                     )
                     Text(
@@ -349,20 +339,21 @@ fun PrintScreen(
                     modifier = Modifier.padding(vertical = 4.dp)
                 ) {
                     Text(
-                        text = "Scanned Weight:",
+                        text = stringResource(R.string.scanned_weight),
                         modifier = Modifier.weight(1f)
                     )
                     TextField(
                         value = scannedWeightState,
                         onValueChange = { scannedWeightState = it },
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .width(120.dp)
                             .padding(end = 20.dp),
                     )
                     Text(
                         text = "(${scannedRoundedWeight}) g",
-                        color = Color.Gray,
+                        color = colorResource(R.color.gray),
                         modifier = Modifier.padding(end = 20.dp)
                     )
                 }
@@ -371,7 +362,7 @@ fun PrintScreen(
                     modifier = Modifier.padding(vertical = 4.dp)
                 ) {
                     Text(
-                        text = "New Weight:",
+                        text = stringResource(R.string.new_weight),
                         modifier = Modifier.weight(1f)
                     )
                     Text(
@@ -379,6 +370,22 @@ fun PrintScreen(
                         modifier = Modifier.padding(end = 20.dp)
                     )
                 }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage!!,
+                            color = colorResource(R.color.red),
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -387,17 +394,25 @@ fun PrintScreen(
                 ) {
                     Button(
                         onClick = {
-                            filamentViewModel.updateFilamentWeight(
-                                filamentId = filament?.id.toString(),
-                                newWeight = newWeight
-                            )
+                            val weight = scannedWeightState.toIntOrNull()
+                            if (weight == null || weight <= 0) {
+                                errorMessage = error1
+                            } else {
+                                filamentViewModel.updateFilamentWeight(
+                                    filamentId = filament?.id.toString(),
+                                    newWeight = newWeight
+                                )
+                                navController.navigate("filaments") {
+                                    popUpTo("filaments") { inclusive = true }
+                                }
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .width(250.dp)
                     ) {
-                        Text("Print")
+                        Text(stringResource(R.string.print))
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.example.spoolsync.viewModels
+package com.example.spoolsync.ui.viewModels
 
 import android.app.Application
 import android.util.Log
@@ -7,8 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.AndroidViewModel
+import com.example.spoolsync.data.model.Filament
 import com.example.spoolsync.notification.Notification
-import com.example.spoolsync.screens.Filament
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -98,8 +98,9 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
                             "brand" to filament.brand,
                             "weight" to filament.weight,
                             "status" to filament.status,
-                            "color" to filament.color,
-                            "expirationDate" to filament.expirationDate,
+                            "color" to "#${filament.color.value.toULong().toString(16).substring(0, 8)}",
+                            "expirationDate" to filament.expirationDate.toString(),
+                            "activeNfc" to !filament.activeNfc,
                             "note" to filament.note
                         )
                     } else {
@@ -144,7 +145,7 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
-    fun updateFilamentNfcStatus(filamentId: String, status: String) {
+    fun updateFilamentNfcStatus(filamentId: String, status: Boolean) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->

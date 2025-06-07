@@ -1,4 +1,4 @@
-package com.example.spoolsync.screens
+package com.example.spoolsync.ui.screens
 
 import android.app.Activity
 import android.nfc.NdefMessage
@@ -9,7 +9,7 @@ import android.nfc.tech.Ndef
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.spoolsync.viewModels.FilamentViewModel
+import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -27,16 +27,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spoolsync.R
+import com.example.spoolsync.ui.viewModels.NfcViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.text.set
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilamentNfcScreen(
     navController: NavController,
-    filamentViewModel: FilamentViewModel = viewModel(),
+    filamentViewModel: FilamentViewModel,
+    nfcViewModel: NfcViewModel,
     mode: FilamentNfcScreenMode,
     filamentId: String? = null
 ) {
@@ -62,7 +63,7 @@ fun FilamentNfcScreen(
         val nfcCallback = object : NfcAdapter.ReaderCallback {
             override fun onTagDiscovered(tag: Tag?) {
                 if (mode == FilamentNfcScreenMode.OCR) {
-                    readNfcTag(
+                    nfcViewModel.readNfcTag(
                         tag,
                         error1,
                         { id ->
@@ -79,7 +80,7 @@ fun FilamentNfcScreen(
                         { error -> errorMessage = error }
                     )
                 } else if (mode == FilamentNfcScreenMode.READ) {
-                    readNfcTag(
+                    nfcViewModel.readNfcTag(
                         tag,
                         error1,
                         { id ->
@@ -97,11 +98,10 @@ fun FilamentNfcScreen(
                         { error -> errorMessage = error }
                     )
                 } else if (mode == FilamentNfcScreenMode.UPDATE && filamentId != null) {
-                    updateNfcTag(
+                    nfcViewModel.updateNfcTag(
                         filamentId,
                         tag,
                         errors,
-                        filamentViewModel,
                         onSuccess = {
                             nfcId = filamentId
                             coroutineScope.launch {
@@ -291,79 +291,6 @@ fun FilamentNfcScreen(
             }
         }
     }
-}
-
-fun readNfcTag(
-    tag: Tag?,
-    error1: String,
-    onNfcRead: (String) -> Unit,
-    onError: (String) -> Unit
-) {
-    tag?.let {
-        val ndef = Ndef.get(tag)
-        try {
-            ndef?.connect()
-            val message = ndef?.ndefMessage
-            val payload = message?.records?.get(0)?.payload
-            if (payload != null) {
-                val languageCodeLength = payload[0].toInt() and 0x3F
-                val nfcId = String(payload, languageCodeLength + 1, payload.size - languageCodeLength - 1, Charsets.UTF_8)
-                onNfcRead(nfcId)
-            }
-        } catch (e: Exception) {
-            onError(error1 + e.message)
-        } finally {
-            ndef?.close()
-        }
-    }
-}
-
-fun updateNfcTag(
-    filamentId: String,
-    tag: Tag?,
-    errors: List<String>,
-    filamentViewModel: FilamentViewModel,
-    onSuccess: () -> Unit,
-    onError: (String) -> Unit
-) {
-    tag?.let {
-        try {
-            val ndef = Ndef.get(tag)
-            ndef?.connect()
-
-            if (ndef != null) {
-                // Make sure the tag is writable
-                if (!ndef.isWritable) {
-                    onError(errors[0])
-                    return
-                }
-
-                // Get max size
-                val maxSize = ndef.maxSize
-                if (filamentId.length > maxSize) {
-                    onError(errors[1])
-                    return
-                }
-
-                // Create and write the message
-                val record = NdefRecord.createTextRecord("en", filamentId)
-                val message = NdefMessage(arrayOf(record))
-                ndef.writeNdefMessage(message)
-
-                filamentViewModel.updateFilamentNfcStatus(filamentId, "true")
-
-                onSuccess()
-            } else {
-                onError(errors[2])
-            }
-        } catch (e: Exception) {
-            onError(errors[3] + e.message)
-        } finally {
-            try {
-                Ndef.get(tag)?.close()
-            } catch (e: Exception) { }
-        }
-    } ?: onError(errors[4])
 }
 
 enum class FilamentNfcScreenMode {

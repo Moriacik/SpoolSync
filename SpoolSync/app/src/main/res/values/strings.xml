@@ -64,10 +64,12 @@
     <string name="nfc_error5">Error updating NFC tag: </string>
     <string name="nfc_error6">Tag is null</string>
 
-    // Ocr strings
-
     // Print strings
-
-
-    stringResource(R.string.nfc_error1)
+    <string name="selected_image">Selected image</string>
+    <string name="filament_information">Filament Information</string>
+    <string name="calculate_new_weight">Calculate New Weight</string>
+    <string name="actual_weight">Actual Weight</string>
+    <string name="scanned_weight">Scanned Weight</string>
+    <string name="new_weight">New Weight</string>
+    <string name="negative_weight">"Please enter a valid positive number"</string>
 </resources>

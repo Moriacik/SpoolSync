@@ -1,4 +1,4 @@
-package com.example.spoolsync
+package com.example.spoolsync.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -7,17 +7,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.spoolsync.viewModels.AuthViewModel
-import com.example.spoolsync.viewModels.FilamentViewModel
-import com.example.spoolsync.screens.FilamentFormMode
-import com.example.spoolsync.screens.FilamentFormScreen
-import com.example.spoolsync.screens.FilamentsScreen
-import com.example.spoolsync.screens.LoginScreen
-import com.example.spoolsync.screens.RegisterScreen
-import com.example.spoolsync.screens.FilamentNfcScreen
-import com.example.spoolsync.screens.FilamentNfcScreenMode
-import com.example.spoolsync.screens.OcrScreen
-import com.example.spoolsync.screens.PrintScreen
+import com.example.spoolsync.ui.viewModels.AuthViewModel
+import com.example.spoolsync.ui.viewModels.FilamentViewModel
+import com.example.spoolsync.ui.screens.FilamentFormMode
+import com.example.spoolsync.ui.screens.FilamentFormScreen
+import com.example.spoolsync.ui.screens.FilamentsScreen
+import com.example.spoolsync.ui.screens.LoginScreen
+import com.example.spoolsync.ui.screens.RegisterScreen
+import com.example.spoolsync.ui.screens.FilamentNfcScreen
+import com.example.spoolsync.ui.screens.FilamentNfcScreenMode
+import com.example.spoolsync.ui.screens.OcrScreen
+import com.example.spoolsync.ui.screens.PrintScreen
+import com.example.spoolsync.ui.viewModels.NfcViewModel
+import com.example.spoolsync.ui.viewModels.OcrViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -26,6 +28,8 @@ fun SpoolSyncApp() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val filamentViewModel: FilamentViewModel = viewModel()
+    val ocrViewModel: OcrViewModel = viewModel()
+    val nfcViewModel: NfcViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -73,6 +77,7 @@ fun SpoolSyncApp() {
             FilamentNfcScreen(
                 navController,
                 filamentViewModel,
+                nfcViewModel,
                 FilamentNfcScreenMode.READ,
                 null
             )
@@ -82,6 +87,7 @@ fun SpoolSyncApp() {
             FilamentNfcScreen(
                 navController,
                 filamentViewModel,
+                nfcViewModel,
                 FilamentNfcScreenMode.OCR,
                 null
             )
@@ -94,13 +100,14 @@ fun SpoolSyncApp() {
             FilamentNfcScreen(
                 navController,
                 filamentViewModel,
+                nfcViewModel,
                 FilamentNfcScreenMode.UPDATE,
                 filamentId
             )
         }
 
         composable("ocr") {
-            OcrScreen(navController)
+            OcrScreen(navController, ocrViewModel)
         }
 
         composable("print/{imageUri}/{filamentId}/{scannedWeight}",

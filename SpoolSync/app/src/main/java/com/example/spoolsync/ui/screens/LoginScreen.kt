@@ -1,4 +1,4 @@
-package com.example.spoolsync.screens
+package com.example.spoolsync.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,7 +15,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
-import com.example.spoolsync.viewModels.AuthViewModel
+import com.example.spoolsync.ui.viewModels.AuthViewModel
 
 @Composable
 fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {

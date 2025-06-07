@@ -1,15 +1,11 @@
-package com.example.spoolsync.screens
+package com.example.spoolsync.ui.screens
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,17 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -42,7 +33,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,28 +40,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.spoolsync.R
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.example.spoolsync.ui.viewModels.OcrViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import kotlin.collections.set
-import kotlin.text.get
 import kotlin.toString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrScreen(
-    navController: NavController
+    navController: NavController,
+    ocrViewModel: OcrViewModel
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -83,7 +68,7 @@ fun OcrScreen(
         uri?.let {
             selectedImageUri = it
             coroutineScope.launch {
-                val scannedText = recognizeTextFromCroppedImage(context, it)
+                val scannedText = ocrViewModel.recognizeTextFromCroppedImage(context, it)
                 navController.currentBackStackEntry
                     ?.savedStateHandle
                     ?.set("selectedImageUri", it.toString())
@@ -121,24 +106,15 @@ fun OcrScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Print", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { /* Account action */ }) {
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Account")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Notification action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications")
-                    }
-                    IconButton(onClick = { /* Settings action */ }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings")
+                            painter = painterResource(R.drawable.ic_printer),
+                            contentDescription = stringResource(R.string.print),
+                            Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = stringResource(R.string.print), fontWeight = FontWeight.Bold)
                     }
                 }
             )
@@ -156,7 +132,7 @@ fun OcrScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
-                                contentDescription = "Filamenty",
+                                contentDescription = stringResource(R.string.filaments),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(48.dp),
                             )
@@ -171,7 +147,7 @@ fun OcrScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
-                                contentDescription = "Info",
+                                contentDescription = stringResource(R.string.info),
                                 tint = Color.Gray,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -186,7 +162,7 @@ fun OcrScreen(
                         icon = {
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
-                                contentDescription = "Tlačiť",
+                                contentDescription = stringResource(R.string.print),
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -199,7 +175,7 @@ fun OcrScreen(
         }
     ) { innerPadding ->
         Column(
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -207,7 +183,7 @@ fun OcrScreen(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                horizontalArrangement = Arrangement.Center
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -215,7 +191,7 @@ fun OcrScreen(
                         .size(300.dp)
                         .padding(16.dp)
                         .background(Color.White)
-                        .border(2.dp, Color.LightGray)
+                        .border(2.dp, colorResource(R.color.light_gray))
                 ) {
                     Box(
                         modifier = Modifier
@@ -227,7 +203,7 @@ fun OcrScreen(
                                 .width(20.dp)
                                 .align(Alignment.TopStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         HorizontalDivider(
@@ -235,7 +211,7 @@ fun OcrScreen(
                                 .width(20.dp)
                                 .align(Alignment.TopEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         HorizontalDivider(
@@ -243,7 +219,7 @@ fun OcrScreen(
                                 .width(20.dp)
                                 .align(Alignment.BottomStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         HorizontalDivider(
@@ -251,7 +227,7 @@ fun OcrScreen(
                                 .width(20.dp)
                                 .align(Alignment.BottomEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -259,7 +235,7 @@ fun OcrScreen(
                                 .height(20.dp)
                                 .align(Alignment.TopStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -267,7 +243,7 @@ fun OcrScreen(
                                 .height(20.dp)
                                 .align(Alignment.TopEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -275,7 +251,7 @@ fun OcrScreen(
                                 .height(20.dp)
                                 .align(Alignment.BottomStart),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
 
                         VerticalDivider(
@@ -283,7 +259,7 @@ fun OcrScreen(
                                 .height(20.dp)
                                 .align(Alignment.BottomEnd),
                             thickness = 4.dp,
-                            color = Color.LightGray
+                            color = colorResource(R.color.light_gray)
                         )
                     }
                 }
@@ -293,7 +269,7 @@ fun OcrScreen(
 
             Row (
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                horizontalArrangement = Arrangement.Center
             ){
                 Box(
                     contentAlignment = Alignment.Center,
@@ -322,29 +298,4 @@ fun OcrScreen(
             }
         }
     }
-}
-
-suspend fun recognizeTextFromCroppedImage(
-    context: Context,
-    imageUri: Uri
-): String? {
-    val inputStream = context.contentResolver.openInputStream(imageUri)
-    val originalBitmap = inputStream?.use { BitmapFactory.decodeStream(it) } ?: return null
-    val cropWidth = minOf(100, originalBitmap.width)
-    val cropHeight = minOf(60, originalBitmap.height)
-    val startX = (originalBitmap.width - cropWidth) / 2
-    val startY = (originalBitmap.height - cropHeight) / 2
-
-    val croppedBitmap = Bitmap.createBitmap(
-        originalBitmap,
-        startX,
-        startY,
-        cropWidth,
-        cropHeight
-    )
-
-    val image = InputImage.fromBitmap(croppedBitmap, 0)
-    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-    val result = recognizer.process(image).await()
-    return result.text
 }

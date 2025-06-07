@@ -1,6 +1,5 @@
-package com.example.spoolsync.screens
+package com.example.spoolsync.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,13 +30,11 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.spoolsync.viewModels.FilamentViewModel
+import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import com.example.spoolsync.R
-import java.time.LocalDate
-import kotlin.collections.get
+import com.example.spoolsync.data.model.Filament
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -286,15 +283,3 @@ fun FilamentItem(filament: Filament, navController: NavController) {
         }
     }
 }
-
-data class Filament(
-    val id: String,
-    val type: String,
-    val brand: String,
-    val weight: Int,
-    val status: String,
-    val color: Color,
-    val expirationDate: LocalDate,
-    val activeNfc: Boolean,
-    val note: String
-)

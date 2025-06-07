@@ -8,12 +8,6 @@ import androidx.work.WorkerParameters
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.spoolsync.R
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.concurrent.TimeUnit
 
 class NotificationWorker(
     context: Context,
