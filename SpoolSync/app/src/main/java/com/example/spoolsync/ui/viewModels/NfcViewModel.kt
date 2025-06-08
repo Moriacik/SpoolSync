@@ -7,10 +7,24 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import androidx.lifecycle.AndroidViewModel
 
-class NfcViewModel(application: Application) : AndroidViewModel(application) {
-    var nfcId: String? = null
-    var errorMessage: String? = null
+/**
+ * ViewModel pre prácu s NFC tagmi.
+ * Umožňuje čítať a zapisovať údaje na NFC tagy pomocou technológie NDEF.
+ *
+ * @param application Kontext aplikácie potrebný pre AndroidViewModel.
+ */
+class NfcViewModel(
+    application: Application
+) : AndroidViewModel(application) {
 
+    /**
+     * Prečíta obsah NFC tagu a vráti ho cez callback.
+     *
+     * @param tag NFC tag, ktorý sa má prečítať.
+     * @param error1 Chybová správa pre prípad zlyhania.
+     * @param onNfcRead Callback s prečítaným obsahom tagu.
+     * @param onError Callback s chybovou správou pri zlyhaní.
+     */
     fun readNfcTag(
         tag: Tag?,
         error1: String,
@@ -36,6 +50,15 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Zapíše filamentId na NFC tag.
+     *
+     * @param filamentId Identifikátor filamentu, ktorý sa má zapísať.
+     * @param tag NFC tag, na ktorý sa má zapisovať.
+     * @param errors Zoznam chybových správ pre rôzne situácie.
+     * @param onSuccess Callback pri úspešnom zápise.
+     * @param onError Callback s chybovou správou pri zlyhaní.
+     */
     fun updateNfcTag(
         filamentId: String,
         tag: Tag?,

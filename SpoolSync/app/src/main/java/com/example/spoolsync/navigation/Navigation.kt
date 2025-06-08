@@ -23,6 +23,10 @@ import com.example.spoolsync.ui.viewModels.OcrViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+/**
+ * Hlavná navigačná funkcia aplikácie SpoolSync.
+ * Definuje všetky navigačné trasy a prepája ich s príslušnými obrazovkami a view modelmi.
+ */
 @Composable
 fun SpoolSyncApp() {
     val navController = rememberNavController()
@@ -33,16 +37,19 @@ fun SpoolSyncApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "filaments",
+        startDestination = "login",
     ) {
+        // Prihlasovanie
         composable("login") {
             LoginScreen(navController, authViewModel)
         }
 
+        // Registrácia
         composable("register") {
             RegisterScreen(navController, authViewModel)
         }
 
+        // Zoznam filamentov
         composable("filaments") {
             filamentViewModel.setUserId(Firebase.auth.currentUser?.uid ?: "")
             FilamentsScreen(
@@ -51,6 +58,7 @@ fun SpoolSyncApp() {
             )
         }
 
+        // Pridanie nového filamentu
         composable("filamentAdd") {
             FilamentFormScreen(
                 navController = navController,
@@ -60,6 +68,7 @@ fun SpoolSyncApp() {
             )
         }
 
+        // Detail filamentu podľa ID
         composable(
             "filamentView/{filamentId}",
             arguments = listOf(navArgument("filamentId") { type = NavType.StringType })
@@ -73,6 +82,7 @@ fun SpoolSyncApp() {
             )
         }
 
+        // Čítanie filamentu cez NFC
         composable("filamentNfcRead") {
             FilamentNfcScreen(
                 navController,
@@ -83,6 +93,7 @@ fun SpoolSyncApp() {
             )
         }
 
+        // Čítanie filamentu cez NFC pre OCR
         composable("filamentNfcReadOcr") {
             FilamentNfcScreen(
                 navController,
@@ -93,6 +104,7 @@ fun SpoolSyncApp() {
             )
         }
 
+        // Aktualizácia NFC podľa ID
         composable("filamentNfcUpdate/{filamentId}",
             arguments = listOf(navArgument("filamentId") { type = NavType.StringType })
         ) { backStackEntry ->
@@ -106,10 +118,12 @@ fun SpoolSyncApp() {
             )
         }
 
+        // OCR skenovanie
         composable("ocr") {
             OcrScreen(navController, ocrViewModel)
         }
 
+        // Tlač filamentu
         composable("print/{imageUri}/{filamentId}/{scannedWeight}",
             arguments = listOf(
                 navArgument("imageUri") { type = NavType.StringType },

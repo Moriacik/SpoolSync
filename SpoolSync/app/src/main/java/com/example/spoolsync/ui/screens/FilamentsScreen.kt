@@ -36,6 +36,13 @@ import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import com.example.spoolsync.R
 import com.example.spoolsync.data.model.Filament
 
+/**
+ * Hlavná obrazovka pre správu filamentov.
+ * Zobrazuje zoznam filamentov a kategórie.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param filamentViewModel ViewModel pre správu filamentov.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilamentsScreen(
@@ -166,7 +173,7 @@ fun FilamentsScreen(
                 modifier = Modifier.padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(listOf(R.drawable.ic_filament, R.drawable.ic_printer, R.drawable.ic_box_closed, R.drawable.ic_box_opened)) { imageResource ->
+                items(listOf(R.drawable.ic_filament, R.drawable.ic_box_opened, R.drawable.ic_box_closed, R.drawable.ic_printer)) { imageResource ->
                     CategoryChip(imageResource,
                         filamentStatuses,
                         selectedCategory,
@@ -178,6 +185,14 @@ fun FilamentsScreen(
     }
 }
 
+/**
+ * Komponent reprezentujúci jednu kategóriu filamentu vo forme čipu.
+ *
+ * @param imageResource Ikona kategórie.
+ * @param filamentStatuses Zoznam statusov filamentov.
+ * @param selectedCategory Aktuálne zvolená kategória.
+ * @param onCategorySelected Callback pri výbere kategórie.
+ */
 @Composable
 fun CategoryChip(
     imageResource: Int,
@@ -187,9 +202,9 @@ fun CategoryChip(
 ) {
     val category = when (imageResource) {
         R.drawable.ic_filament -> ""
-        R.drawable.ic_printer -> filamentStatuses[0]
+        R.drawable.ic_box_opened -> filamentStatuses[0]
         R.drawable.ic_box_closed -> filamentStatuses[1]
-        R.drawable.ic_box_opened -> filamentStatuses[2]
+        R.drawable.ic_printer -> filamentStatuses[2]
         else -> ""
     }
 
@@ -224,9 +239,9 @@ fun CategoryChip(
         Text(
             text = when (imageResource) {
                 R.drawable.ic_filament -> stringResource(R.string.all)
-                R.drawable.ic_printer -> filamentStatuses[0]
+                R.drawable.ic_box_opened -> filamentStatuses[0]
                 R.drawable.ic_box_closed -> filamentStatuses[1]
-                R.drawable.ic_box_opened -> filamentStatuses[2]
+                R.drawable.ic_printer -> filamentStatuses[2]
                 else -> ""
             },
             style = MaterialTheme.typography.bodyLarge,
@@ -235,6 +250,12 @@ fun CategoryChip(
     }
 }
 
+/**
+ * Komponent zobrazujúci jednu položku filamentu v zozname.
+ *
+ * @param filament Filament, ktorý sa má zobraziť.
+ * @param navController Navigácia v aplikácii.
+ */
 @Composable
 fun FilamentItem(filament: Filament, navController: NavController) {
     Row(

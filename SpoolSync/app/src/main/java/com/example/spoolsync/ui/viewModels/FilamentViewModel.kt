@@ -17,23 +17,38 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.util.UUID
 
-class FilamentViewModel(application: Application) : AndroidViewModel(application) {
+/**
+ * ViewModel pre správu filamentov používateľa.
+ * Zodpovedá za načítanie, pridávanie, aktualizáciu a mazanie filamentov v databáze Firestore.
+ * Umožňuje tiež aktualizovať hmotnosť a NFC stav filamentu, načítať filament podľa ID a spravovať notifikácie.
+ *
+ * @param application Kontext aplikácie potrebný pre AndroidViewModel.
+ */
+class FilamentViewModel(
+    application: Application
+) : AndroidViewModel(application) {
     private val db: FirebaseFirestore = Firebase.firestore
     private var userId = Firebase.auth.currentUser?.uid ?: ""
     val currentFilament = mutableStateOf<Filament?>(null)
     val filaments = mutableStateListOf<Filament>()
 
+    /**
+     * Inicializuje ViewModel a načíta filamenty používateľa.
+     * Ak nie je používateľ prihlásený, nastaví userId na prázdny reťazec.
+     */
     fun setUserId(newUserId: String) {
         userId = newUserId
         loadFilaments()
     }
 
-
+    /**
+     * Načíta všetky filamenty používateľa z Firestore a aktualizuje stav filaments.
+     * Používa addSnapshotListener pre sledovanie zmien v reálnom čase.
+     */
     fun loadFilaments() {
         db.collection("users").document(userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    Log.e("FilamentViewModel", "Error loading filaments", error)
                     return@addSnapshotListener
                 }
 
@@ -54,14 +69,20 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
                                 note = data["note"] as? String ?: ""
                             )
                         )
-                    } catch (e: Exception) {
-                        Log.e("FilamentViewModel", "Error parsing filament: ${e.message}")
+                    }
+                    catch (_: Exception) {
                     }
                 }
             }
     }
 
-    fun saveNewFilament(filament: Filament) {
+    /**
+     * Uloží nový filament do Firestore a naplánuje notifikáciu pre jeho expiráciu.
+     * @param filament Objekt Filament, ktorý sa má uložiť.
+     */
+    fun saveNewFilament(
+        filament: Filament
+    ) {
         val newFilament = mapOf(
            "id" to  UUID.randomUUID().toString(),
             "type" to filament.type,
@@ -80,12 +101,17 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
         Notification.scheduleNotification(
             getApplication<Application>().applicationContext,
             filament.id,
-            filament.type,
             filament.expirationDate
         )
     }
 
-    fun saveExistfilament(filament: Filament) {
+    /**
+     * Uloží existujúci filament do Firestore, aktualizuje jeho údaje a prepíše existujúce hodnoty.
+     * @param filament Objekt Filament, ktorý sa má uložiť.
+     */
+    fun saveExistfilament(
+        filament: Filament
+    ) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -113,7 +139,15 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
-    fun loadFilamentById(filamentId: String, callback: (Boolean) -> Unit) {
+    /**
+     * Načíta filament podľa jeho ID a aktualizuje currentFilament.
+     * @param filamentId ID filamentu, ktorý sa má načítať.
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom načítania.
+     */
+    fun loadFilamentById(
+        filamentId: String,
+        callback: (Boolean) -> Unit
+    ) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -145,7 +179,15 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
-    fun updateFilamentNfcStatus(filamentId: String, status: Boolean) {
+    /**
+     * Aktualizuje stav NFC pre daný filament podľa jeho ID.
+     * @param filamentId ID filamentu, ktorého NFC stav sa má aktualizovať.
+     * @param status Nový stav NFC.
+     */
+    fun updateFilamentNfcStatus(
+        filamentId: String,
+        status: Boolean
+    ) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -165,7 +207,15 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
-    fun updateFilamentWeight(filamentId: String, newWeight: Int) {
+    /**
+     * Aktualizuje hmotnosť filamentu podľa jeho ID.
+     * @param filamentId ID filamentu, ktorého hmotnosť sa má aktualizovať.
+     * @param newWeight Nová hmotnosť filamentu.
+     */
+    fun updateFilamentWeight(
+        filamentId: String,
+        newWeight: Int
+    ) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -185,7 +235,13 @@ class FilamentViewModel(application: Application) : AndroidViewModel(application
             }
     }
 
-    fun deleteFilament(filamentId: String) {
+    /**
+     * Odstráni filament podľa jeho ID z databázy.
+     * @param filamentId ID filamentu, ktorý sa má odstrániť.
+     */
+    fun deleteFilament(
+        filamentId: String
+    ) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->

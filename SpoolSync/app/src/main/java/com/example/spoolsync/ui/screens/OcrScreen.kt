@@ -21,7 +21,6 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -29,7 +28,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,10 +46,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
+import com.example.spoolsync.ui.components.DecorativeCornerDividers
 import com.example.spoolsync.ui.viewModels.OcrViewModel
 import kotlinx.coroutines.launch
 import kotlin.toString
 
+/**
+ * Obrazovka pre rozpoznávanie textu z obrázka pomocou OCR.
+ * Umožňuje používateľovi vybrať obrázok, spustiť rozpoznávanie textu a následne navigovať podľa výsledku.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param ocrViewModel ViewModel pre spracovanie OCR operácií.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OcrScreen(
@@ -198,69 +204,7 @@ fun OcrScreen(
                             .size(100.dp, 60.dp)
                             .background(Color.Transparent)
                     ) {
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.TopStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.TopEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.BottomStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.BottomEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.TopStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.TopEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.BottomStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.BottomEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
+                        DecorativeCornerDividers()
                     }
                 }
             }

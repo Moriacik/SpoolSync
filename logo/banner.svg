@@ -1,0 +1,83 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="1000" height="300">
+	<title>Nový projekt</title>
+	<style>
+		.s0 { fill: #888888 } 
+		.s1 { fill: none;stroke: #000000;stroke-miterlimit:100;stroke-width: 4.8 } 
+		.s2 { fill: none;stroke: #000000;stroke-miterlimit:100;stroke-width: 2.4 } 
+	</style>
+	<path id="Sp  lSync" class="s0" aria-label="Sp  lSync"  d="m150.5 172.6q0 13.6-10.5 23-10.4 9.4-26.2 9.4-13.5 0-22.8-7.2-7.5-6-7.9-11.7v16.9h-10.8v-35.3h10.8q0 9.9 8 17.8 8.9 8.8 22.7 8.8 12.9 0 19.1-7.8 4.2-5.5 4.2-12.8 0-13.5-16.4-21.3-15.2-6.3-30.4-12.4-16.5-9-16.5-25.9 0-12.3 9.3-20.7 10.1-9.2 26.7-9.2 10.7 0 19.1 6.3 7.9 6 7.9 12.4v-16.6h10.9v33.2h-10.9q0-9.9-8-17.1-8.1-7.4-19-7.4-10.5 0-16.9 5.7-6.4 5.6-6.4 13.3 0 11.3 16.6 18.4 15.4 6.4 30.9 12.8 16.5 9.7 16.5 27.4zm102.9-11.2q0 18.7-10.4 30.7-11.4 13.2-31.9 13.2-13.2 0-24.5-8.8v39.8h-12.6v-116.6h12.6v6.7q11.3-8.8 24.5-8.8 20.5 0 31.9 13.3 10.4 12 10.4 30.5zm-12.4 0q0-13.9-6.7-23-7.9-10.8-23.2-10.8-13.6 0-24.5 11.4v44.8q10.9 11.4 24.5 11.4 15.3 0 23.2-10.7 6.7-9 6.7-23.1zm296 30.7v10.9h-50v-10.9h18.7v-95.1h-18.7v-10.7h31.2v105.8zm113.8-19.5q0 13.6-10.5 23-10.4 9.4-26.2 9.4-13.5 0-22.8-7.2-7.5-6-7.9-11.7v16.9h-10.8v-35.3h10.8q0 9.9 8 17.8 8.9 8.8 22.7 8.8 12.9 0 19.1-7.8 4.2-5.5 4.2-12.8 0-13.5-16.4-21.3-15.2-6.3-30.4-12.4-16.5-9-16.5-25.9 0-12.3 9.3-20.7 10.1-9.2 26.7-9.2 10.7 0 19.1 6.3 7.9 6 7.9 12.4v-16.6h10.9v33.2h-10.9q0-9.9-8-17.1-8.1-7.4-19-7.4-10.5 0-16.9 5.7-6.4 5.6-6.4 13.3 0 11.3 16.6 18.4 15.4 6.4 30.9 12.8 16.5 9.7 16.5 27.4zm87.6-52.9h14.6l-39.8 102.3q-2.2 5.3-7.8 9.2-7.3 5.1-17.6 5.1-7.6 0-16.6-3l2.7-12.6q9.9 2.8 14.9 2.8 8.3 0 11-6.7l4.8-11.5-34.9-85.6h14.6l28.1 72zm111.8 31.9v51.4h-12.5v-51.4q0-22.2-18.3-22.2-14.6 0-23.5 10.9-8.4 10.2-8.4 25.3v37.4h-12.6v-83.5h12.6v21q8.7-23 31.9-23 30.8 0 30.8 34.1zm92.1 29.7l8.5 6q-11.3 18-36.2 18-20.6 0-32.8-13.3-11.1-12.2-11.1-30.6 0-18.5 10.3-30.5 11.5-13.4 31.9-13.4 9.3 0 16.9 4.8 7.7 4.7 9.3 10.9v-13.7h10.9v33.3h-10.9q0-10.8-8.6-18.4-8-6.8-17.6-6.8-15.2 0-23.1 10.8-6.7 9.1-6.7 23 0 13.6 7.5 23.1 8.6 10.7 24 10.7 9.2 0 16.7-3.8 7.5-3.9 11-10.1z"/>
+	<g id="Priečinok 1">
+		<path id="Tvar 1 copy" fill-rule="evenodd" class="s1" d="m423.5 205.8c-23.4 0-42.3-18.9-42.3-42.3 0-23.4 18.9-42.3 42.3-42.3 23.4 0 42.3 18.9 42.3 42.3 0 23.4-18.9 42.3-42.3 42.3z"/>
+		<path id="Tvar 3 copy 34" fill-rule="evenodd" class="s2" d="m439.4 177.1h-7.9l-1.6-2.9 6.5-10.7h3l3.9 6.8z"/>
+		<path id="Tvar 3 copy 35" fill-rule="evenodd" class="s2" d="m427.5 197.5h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 36" fill-rule="evenodd" class="s2" d="m439.6 163.5h-3.2l-6.4-11.6 1.7-2h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 37" fill-rule="evenodd" class="s2" d="m429.6 152.1l-12.7-0.1-1.2-2.4 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 38" fill-rule="evenodd" class="s2" d="m410.9 163.5h-3.1l-4-6.8 4-6.8h7.8l1 1.8z"/>
+		<path id="Tvar 3 copy 39" fill-rule="evenodd" class="s2" d="m415.6 177.1h-7.8l-4-6.8 4-6.8h2.1l7 10.6z"/>
+		<path id="Tvar 3 copy 40" fill-rule="evenodd" class="s2" d="m427.5 183.7h-7.9l-3.9-6.8 1.5-2.5h12.6l1.6 2.5z"/>
+		<path id="Tvar 3 copy 41" fill-rule="evenodd" class="s2" d="m415.9 190.9h-7.9l-3.9-6.9 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 42" fill-rule="evenodd" class="s2" d="m404 197.7l-5.2 0.4-6.6-7.2 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 43" fill-rule="evenodd" class="s2" d="m415.9 204.4l-7.5-0.9-4.3-5.9 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 44" fill-rule="evenodd" class="s2" d="m403.8 170.2h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 45" fill-rule="evenodd" class="s2" d="m391.9 177.1h-7.9l-3.4-9.3 3.4-4.3h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 46" fill-rule="evenodd" class="s2" d="m403.8 183.7h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 47" fill-rule="evenodd" class="s2" d="m403.8 143.1h-7.9l-3.9-6.8 4.9-6.3 6.9-0.5 3.9 6.8z"/>
+		<path id="Tvar 3 copy 48" fill-rule="evenodd" class="s2" d="m391.9 150h-7.9l-0.7-0.9 5.6-10.9 3-1.8 3.9 6.8z"/>
+		<path id="Tvar 3 copy 49" fill-rule="evenodd" class="s2" d="m403.8 156.7h-7.9l-3.9-6.9 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 50" fill-rule="evenodd" class="s2" d="m439.4 136h-7.9l-3.9-6.8 3.9-6.8 6.9 1.2 4.9 5.6z"/>
+		<path id="Tvar 3 copy 51" fill-rule="evenodd" class="s2" d="m427.5 142.9h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 52" fill-rule="evenodd" class="s2" d="m439.4 149.5h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 53" fill-rule="evenodd" class="s2" d="m463.1 149.3h-7.8l-4-6.8 4-6.8 2.7 2.1 3.8 7.3z"/>
+		<path id="Tvar 3 copy 54" fill-rule="evenodd" class="s2" d="m451.3 156.2h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 55" fill-rule="evenodd" class="s2" d="m463.1 162.8h-7.8l-4-6.8 4-6.8h7.8l2.3 6.7z"/>
+		<path id="Tvar 3 copy 56" fill-rule="evenodd" class="s2" d="m463.6 176.4h-7.9l-3.9-6.8 3.9-6.9h7.9l1.9 6.6z"/>
+		<path id="Tvar 3 copy 57" fill-rule="evenodd" class="s2" d="m451.7 183.3h-7.8l-4-6.9 4-6.8h7.8l4 6.8z"/>
+		<path id="Tvar 3 copy 58" fill-rule="evenodd" class="s2" d="m458.4 187.3l-2.7 2.6-3.9-6.8 3.9-6.8h7.9l-1.6 5.1z"/>
+		<path id="Tvar 3 copy 59" fill-rule="evenodd" class="s2" d="m451.7 196.1l-7.6 0.7-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 60" fill-rule="evenodd" class="s2" d="m440.1 203.7h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 61" fill-rule="evenodd" class="s2" d="m431.2 205.7l-13.8 0.1-1-1.6 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 62" fill-rule="evenodd" class="s2" d="m427.5 197.5h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 63" fill-rule="evenodd" class="s2" d="m415.6 149.8h-7.8l-4-6.8 4-6.9h7.8l4 6.9z"/>
+		<path id="Tvar 3 copy 64" fill-rule="evenodd" class="s2" d="m415.9 136h-7.9l-3.9-6.8 4.2-6.2 7.6-0.6 3.9 6.8z"/>
+		<path id="Tvar 3 copy 65" fill-rule="evenodd" class="s2" d="m391.9 163.5h-7.9l-3.2-7.4 3.2-6.2h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 66" fill-rule="evenodd" class="s2" d="m451.3 142.4h-7.9l-3.9-6.8 3.9-6.8h3.6l8.2 6.8z"/>
+		<path id="Tvar 2 copy" fill-rule="evenodd" class="s1" d="m423.4 175.6c-6.8 0-12.3-5.5-12.3-12.2 0.1-6.8 5.5-12.3 12.3-12.3 6.7 0 12.2 5.5 12.2 12.3 0 6.7-5.5 12.2-12.2 12.2z"/>
+	</g>
+	<g id="Priečinok 2">
+		<path id="Tvar 1" fill-rule="evenodd" class="s1" d="m317.5 205.8c-23.4 0-42.3-18.9-42.3-42.3 0-23.4 18.9-42.3 42.3-42.3 23.4 0 42.3 18.9 42.3 42.3 0 23.4-18.9 42.3-42.3 42.3z"/>
+		<path id="Tvar 3 copy" fill-rule="evenodd" class="s2" d="m333.4 177.1h-7.9l-1.6-2.9 6.5-10.7h3l3.9 6.8z"/>
+		<path id="Tvar 3 copy 33" fill-rule="evenodd" class="s2" d="m321.5 197.5h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 2" fill-rule="evenodd" class="s2" d="m333.6 163.5h-3.2l-6.4-11.6 1.7-2h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 3" fill-rule="evenodd" class="s2" d="m323.6 152.1l-12.7-0.1-1.2-2.4 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 4" fill-rule="evenodd" class="s2" d="m304.9 163.5h-3.1l-4-6.8 4-6.8h7.8l1 1.8z"/>
+		<path id="Tvar 3 copy 5" fill-rule="evenodd" class="s2" d="m309.6 177.1h-7.8l-4-6.8 4-6.8h2.1l7 10.6z"/>
+		<path id="Tvar 3 copy 6" fill-rule="evenodd" class="s2" d="m321.5 183.7h-7.9l-3.9-6.8 1.5-2.5h12.6l1.6 2.5z"/>
+		<path id="Tvar 3 copy 7" fill-rule="evenodd" class="s2" d="m309.9 190.9h-7.9l-3.9-6.9 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 8" fill-rule="evenodd" class="s2" d="m298 197.7l-5.2 0.4-6.6-7.2 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 9" fill-rule="evenodd" class="s2" d="m309.9 204.4l-7.5-0.9-4.3-5.9 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 10" fill-rule="evenodd" class="s2" d="m297.8 170.2h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 11" fill-rule="evenodd" class="s2" d="m285.9 177.1h-7.9l-3.4-9.3 3.4-4.3h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 12" fill-rule="evenodd" class="s2" d="m297.8 183.7h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 13" fill-rule="evenodd" class="s2" d="m297.8 143.1h-7.9l-3.9-6.8 4.9-6.3 6.9-0.5 3.9 6.8z"/>
+		<path id="Tvar 3 copy 14" fill-rule="evenodd" class="s2" d="m285.9 150h-7.9l-0.7-0.9 5.6-10.9 3-1.8 3.9 6.8z"/>
+		<path id="Tvar 3 copy 15" fill-rule="evenodd" class="s2" d="m297.8 156.7h-7.9l-3.9-6.9 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 16" fill-rule="evenodd" class="s2" d="m333.4 136h-7.9l-3.9-6.8 3.9-6.8 6.9 1.2 4.9 5.6z"/>
+		<path id="Tvar 3 copy 17" fill-rule="evenodd" class="s2" d="m321.5 142.9h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 18" fill-rule="evenodd" class="s2" d="m333.4 149.5h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 19" fill-rule="evenodd" class="s2" d="m357.1 149.3h-7.8l-4-6.8 4-6.8 2.7 2.1 3.8 7.3z"/>
+		<path id="Tvar 3 copy 20" fill-rule="evenodd" class="s2" d="m345.3 156.2h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 21" fill-rule="evenodd" class="s2" d="m357.1 162.8h-7.8l-4-6.8 4-6.8h7.8l2.3 6.7z"/>
+		<path id="Tvar 3 copy 22" fill-rule="evenodd" class="s2" d="m357.6 176.4h-7.9l-3.9-6.8 3.9-6.9h7.9l1.9 6.6z"/>
+		<path id="Tvar 3 copy 23" fill-rule="evenodd" class="s2" d="m345.7 183.3h-7.8l-4-6.9 4-6.8h7.8l4 6.8z"/>
+		<path id="Tvar 3 copy 24" fill-rule="evenodd" class="s2" d="m352.4 187.3l-2.7 2.6-3.9-6.8 3.9-6.8h7.9l-1.6 5.1z"/>
+		<path id="Tvar 3 copy 25" fill-rule="evenodd" class="s2" d="m345.7 196.1l-7.6 0.7-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 26" fill-rule="evenodd" class="s2" d="m334.1 203.7h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 27" fill-rule="evenodd" class="s2" d="m325.2 205.7l-13.8 0.1-1-1.6 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 28" fill-rule="evenodd" class="s2" d="m321.5 197.5h-7.9l-3.9-6.8 3.9-6.8h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 29" fill-rule="evenodd" class="s2" d="m309.6 149.8h-7.8l-4-6.8 4-6.9h7.8l4 6.9z"/>
+		<path id="Tvar 3 copy 30" fill-rule="evenodd" class="s2" d="m309.9 136h-7.9l-3.9-6.8 4.2-6.2 7.6-0.6 3.9 6.8z"/>
+		<path id="Tvar 3 copy 31" fill-rule="evenodd" class="s2" d="m285.9 163.5h-7.9l-3.2-7.4 3.2-6.2h7.9l3.9 6.8z"/>
+		<path id="Tvar 3 copy 32" fill-rule="evenodd" class="s2" d="m345.3 142.4h-7.9l-3.9-6.8 3.9-6.8h3.6l8.2 6.8z"/>
+		<path id="Tvar 2" fill-rule="evenodd" class="s1" d="m317.4 175.6c-6.8 0-12.3-5.5-12.3-12.2 0.1-6.8 5.5-12.3 12.3-12.3 6.7 0 12.2 5.5 12.2 12.3 0 6.7-5.5 12.2-12.2 12.2z"/>
+	</g>
+</svg>

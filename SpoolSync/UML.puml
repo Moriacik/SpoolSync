@@ -1,0 +1,94 @@
+@startuml
+class MainActivity {
+}
+
+class SpoolSyncApplication {
+}
+
+class Filament {
+}
+
+class Navigation {
+}
+
+class Notification {
+}
+
+class NotificationWorker {
+}
+
+class NotificationReceiver {
+}
+
+class CustomConstants {
+}
+
+class FilamentFormScreen {
+}
+
+class FilamentsScreen {
+}
+
+class LoginScreen {
+}
+
+class NfcScreen {
+}
+
+class OcrFormScreen {
+}
+
+class PrintFormScreen {
+}
+
+class RegisterScreen {
+}
+
+class AuthViewModel {
+}
+
+class FilamentViewModel {
+}
+
+class NfcViewModel {
+}
+
+class OcrViewModel {
+}
+
+MainActivity <-- SpoolSyncApplication
+SpoolSyncApplication <-- Notification
+
+Navigation <-- FilamentFormScreen
+Navigation <-- FilamentsScreen
+Navigation <-- LoginScreen
+Navigation <-- NfcScreen
+Navigation <-- OcrFormScreen
+Navigation <-- PrintFormScreen
+Navigation <-- RegisterFormScreen
+
+NotificationReceiver <-- NotificationWorker
+
+FilamentFormScreen <-- Filament
+FilamentFormScreen <-- FilamentViewModel
+FilamentFormScreen <-- CustomConstants
+
+FilamentsScreen <-- Filament
+FilamentsScreen <-- FilamentViewModel
+
+RegisterScreen <-- AuthViewModel
+LoginScreen <-- AuthViewModel
+
+NfcScreen <-- NfcViewModel
+OcrFormScreen <-- OcrViewModel
+
+FilamentViewModel <-- Filament
+NfcViewModel <-- Filament
+OcrViewModel <-- Filament
+PrintFormScreen <-- Filament
+Notification <-- Filament
+
+OcrFormScreen <-- CustomConstants
+PrintFormScreen <-- CustomConstants
+
+@enduml

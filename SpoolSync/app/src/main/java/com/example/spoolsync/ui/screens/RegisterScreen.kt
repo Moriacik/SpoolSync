@@ -13,7 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -35,8 +36,18 @@ import androidx.navigation.NavController
 import com.example.spoolsync.R
 import com.example.spoolsync.ui.viewModels.AuthViewModel
 
+/**
+ * Obrazovka pre registráciu nového používateľa.
+ * Umožňuje zadať email, heslo a potvrdenie hesla, spracováva registráciu a naviguje po úspešnej registrácii.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param authViewModel ViewModel pre autentifikáciu používateľa.
+ */
 @Composable
-fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
+fun RegisterScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -54,9 +65,10 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium
+        Icon(
+            painter = painterResource(id = R.drawable.banner),
+            contentDescription = null,
+            tint = Color.Unspecified
         )
 
         Spacer(modifier = Modifier.height(32.dp))

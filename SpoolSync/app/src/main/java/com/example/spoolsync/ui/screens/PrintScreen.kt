@@ -24,7 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -34,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,10 +57,22 @@ import androidx.navigation.NavController
 import com.example.spoolsync.R
 import androidx.core.net.toUri
 import com.example.spoolsync.data.model.Filament
+import com.example.spoolsync.ui.components.DecorativeCornerDividers
 import com.example.spoolsync.ui.components.FormWithIcon
 import com.example.spoolsync.ui.components.InputType
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 
+/**
+ * Obrazovka pre aktualizáciu hmotnosti filamentu po tlači.
+ * Zobrazuje vybraný obrázok, informácie o filamente a umožňuje zmeniť naskenovanú hmotnosť.
+ * Po potvrdení aktualizuje hmotnosť filamentu a naviguje späť na zoznam filamentov.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param filamentViewModel ViewModel pre správu filamentov.
+ * @param imageUri URI obrázka naskenovaného filamentu.
+ * @param filament Filament, ktorého hmotnosť sa aktualizuje.
+ * @param scannedWeight Naskenovaná hmotnosť filamentu.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrintScreen(
@@ -192,69 +202,7 @@ fun PrintScreen(
                             .size(100.dp, 60.dp)
                             .background(Color.Transparent)
                     ) {
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.TopStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.TopEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.BottomStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .width(20.dp)
-                                .align(Alignment.BottomEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.TopStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.TopEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.BottomStart),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
-
-                        VerticalDivider(
-                            modifier = Modifier
-                                .height(20.dp)
-                                .align(Alignment.BottomEnd),
-                            thickness = 4.dp,
-                            color = colorResource(R.color.light_gray)
-                        )
+                        DecorativeCornerDividers()
                     }
                 }
             }

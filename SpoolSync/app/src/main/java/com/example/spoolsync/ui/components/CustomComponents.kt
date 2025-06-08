@@ -26,12 +26,14 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
@@ -56,10 +59,26 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
+/**
+ * Typy vstupov, ktoré môžu byť použité v komponente FormWithIcon.
+ * Každý typ reprezentuje iný spôsob zadávania a práce s údajmi.
+ */
 enum class InputType {
     TEXT, WEIGHT_FIELD, DROPDOWN, DATE_PICKER, COLOR_PICKER, NFC_FIELD
 }
 
+/**
+ * Komponent pre formulár s ikonou, ktorý umožňuje zadávanie rôznych typov údajov.
+ *
+ * @param icon Ikona, ktorá sa zobrazí vedľa formulára.
+ * @param value Aktuálna hodnota poľa formuláur.
+ * @param id Identifikátor filamentu.
+ * @param onValueChange Funkcia, ktorá sa zavolá pri zmene hodnoty formulára.
+ * @param inputType Typ vstupu.
+ * @param options Možnosti pre dropdown menu.
+ * @param navController Navigačný kontrolér pre navigáciu v aplikácii.
+ * @param isEditable Určuje, či je formulár editovateľný.
+ */
 @Composable
 fun <T> FormWithIcon(
     icon: Painter,
@@ -177,7 +196,12 @@ fun <T> FormWithIcon(
     }
 }
 
-
+/**
+ * Komponent pre zadávanie hmotnosti.
+ *
+ * @param weight Aktuálna hmotnosť vo forme reťazca.
+ * @param onWeightChange Funkcia, ktorá sa zavolá pri zmene hmotnosti.
+ */
 @Composable
 fun WeightInputField(
     weight: String,
@@ -224,6 +248,13 @@ fun WeightInputField(
     }
 }
 
+/**
+ * Komponent pre výber z viacerých možností.
+ *
+ * @param options Zoznam možností na výber.
+ * @param selectedOption Aktuálne vybraná možnosť.
+ * @param onOptionSelected Funkcia, ktorá sa zavolá pri výbere novej možnosti.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownField(
@@ -280,6 +311,12 @@ fun DropdownField(
     }
 }
 
+/**
+ * Komponent pre výber farby.
+ *
+ * @param selectedColor Aktuálne vybraná farba.
+ * @param onColorSelected Funkcia, ktorá sa zavolá pri výbere novej farby.
+ */
 @Composable
 fun ColorPicker(
     selectedColor: Color,
@@ -323,6 +360,12 @@ fun ColorPicker(
     }
 }
 
+/**
+ * Komponent pre výber dátumu.
+ *
+ * @param selectedDate Aktuálne vybraný dátum.
+ * @param onDateSelected Funkcia, ktorá sa zavolá pri výbere nového dátumu.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePicker(
@@ -380,5 +423,90 @@ fun DatePicker(
                 DatePicker(state = datePickerState)
             }
         }
+    }
+}
+
+/**
+ * Dekoratívny komponent vytvárajúci zameriavanie pre OCR.
+ *
+ * @param modifier Modifier pre úpravu vzhľadu komponentu.
+ * @param boxWidth Šírka boxu s rohmi.
+ * @param boxHeight Výška boxu s rohmi.
+ * @param dividerLength Dĺžka jednotlivých deliacich čiar.
+ * @param dividerThickness Hrúbka deliacich čiar.
+ * @param dividerColor Farba deliacich čiar.
+ */
+@Composable
+fun DecorativeCornerDividers(
+    modifier: Modifier = Modifier,
+    boxWidth: Dp = 100.dp,
+    boxHeight: Dp = 60.dp,
+    dividerLength: Dp = 20.dp,
+    dividerThickness: Dp = 4.dp,
+    dividerColor: Color = colorResource(R.color.light_gray)
+) {
+    Box(
+        modifier = modifier
+            .size(boxWidth, boxHeight)
+    ) {
+        // Horizontálne deliace čiary
+        HorizontalDivider(
+            modifier = Modifier
+                .width(dividerLength)
+                .align(Alignment.TopStart),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+        HorizontalDivider(
+            modifier = Modifier
+                .width(dividerLength)
+                .align(Alignment.TopEnd),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+        HorizontalDivider(
+            modifier = Modifier
+                .width(dividerLength)
+                .align(Alignment.BottomStart),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+        HorizontalDivider(
+            modifier = Modifier
+                .width(dividerLength)
+                .align(Alignment.BottomEnd),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+
+        // Vertikálne deliace čiary v rohoch
+        VerticalDivider(
+            modifier = Modifier
+                .height(dividerLength)
+                .align(Alignment.TopStart),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+        VerticalDivider(
+            modifier = Modifier
+                .height(dividerLength)
+                .align(Alignment.TopEnd),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+        VerticalDivider(
+            modifier = Modifier
+                .height(dividerLength)
+                .align(Alignment.BottomStart),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
+        VerticalDivider(
+            modifier = Modifier
+                .height(dividerLength)
+                .align(Alignment.BottomEnd),
+            thickness = dividerThickness,
+            color = dividerColor
+        )
     }
 }

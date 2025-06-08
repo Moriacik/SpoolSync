@@ -1,25 +1,41 @@
 package com.example.spoolsync.ui.viewModels
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+/**
+ * ViewModel pre autentifikáciu používateľa.
+ * Zodpovedá za prihlasovanie a registráciu používateľov pomocou Firebase Auth a Firestore.
+ *
+ * @param application Kontext aplikácie potrebný pre AndroidViewModel.
+ */
+class AuthViewModel(
+    application: Application
+) : AndroidViewModel(application) {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
 
-    private val TAG = "AuthViewModel"
-
-    fun loginUser(email: String, password: String, callback: (Boolean, String?) -> Unit) {
+    /**
+     * Kontrola, či je používateľ úspešne prihlásený.
+     *
+     * @param email Email používateľa.
+     * @param password Heslo používateľa.
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom prihlásenia.
+     * @return True, ak je používateľ prihlásený, inak False.
+     */
+    fun loginUser(
+        email: String,
+        password: String,
+        callback: (Boolean, String?) -> Unit
+    ) {
         try {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Login successful")
                         callback(true, null)
                     } else {
                         val exception = task.exception
@@ -28,20 +44,26 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                             is FirebaseAuthInvalidCredentialsException -> "Nesprávne heslo"
                             else -> "Prihlásenie zlyhalo: ${exception?.message ?: "Neznáma chyba"}"
                         }
-                        Log.e(TAG, "Login failed: $errorMessage", exception)
                         callback(false, errorMessage)
                     }
                 }
                 .addOnFailureListener { e ->
-                    Log.e(TAG, "Login error: ${e.message}", e)
                     callback(false, "Chyba prihlásenia: ${e.message}")
                 }
         } catch (e: Exception) {
-            Log.e(TAG, "Exception during login", e)
             callback(false, "Chyba: ${e.message}")
         }
     }
 
+    /**
+     * Registrácia nového používateľa.
+     * Vytvorí používateľský účet a uloží profil do Firestore.
+     *
+     * @param email Email používateľa.
+     * @param password Heslo používateľa.
+     * @param onSuccess Funkcia, ktorá sa zavolá pri úspešnej registrácii.
+     * @param onError Funkcia, ktorá sa zavolá pri chybe registrácie s chybovou správou.
+     */
     fun registerUser(
         email: String,
         password: String,

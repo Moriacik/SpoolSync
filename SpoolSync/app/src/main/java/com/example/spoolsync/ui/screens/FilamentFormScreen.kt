@@ -31,10 +31,22 @@ import com.example.spoolsync.ui.components.InputType
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import java.time.LocalDate
 
+/**
+ * Režimi formulára pre správu filamentu.
+ */
 enum class FilamentFormMode {
     VIEW, ADD, EDIT
 }
 
+/**
+ * Obrazovka formulára pre správu filamentu.
+ * Umožňuje zobraziť, pridať alebo upraviť informácie o filamente podľa zvoleného režimu.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param mode Režim formulára.
+ * @param initialFilament Počiatočné údaje filamentu (nepovinný).
+ * @param filamentViewModel ViewModel pre správu filamentov.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilamentFormScreen(
@@ -355,6 +367,14 @@ fun FilamentFormScreen(
     }
 }
 
+/**
+ * Komponent pre editovateľný formulár filamentu.
+ * Zobrazuje polia na úpravu vlastností filamentu.
+ *
+ * @param filament Aktuálne upravovaný filament.
+ * @param onFilamentChange Callback pri zmene údajov filamentu.
+ * @param navController Navigácia v aplikácii.
+ */
 @Composable
 private fun EditableFilamentForm(
     filament: Filament,
@@ -417,6 +437,13 @@ private fun EditableFilamentForm(
     }
 }
 
+/**
+ * Komponent pre zobrazenie informácií o filamente.
+ * Režim iba na čítanie.
+ *
+ * @param filament Filament, ktorého informácie sa zobrazujú.
+ * @param navController Navigácia v aplikácii.
+ */
 @Composable
 private fun FilamentInfoDisplay(
     filament: Filament,

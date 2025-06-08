@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -17,8 +18,18 @@ import androidx.navigation.NavController
 import com.example.spoolsync.R
 import com.example.spoolsync.ui.viewModels.AuthViewModel
 
+/**
+ * Obrazovka pre prihlásenie používateľa.
+ * Umožňuje zadať email a heslo, spracováva prihlásenie a naviguje po úspešnom prihlásení.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param authViewModel ViewModel pre autentifikáciu používateľa.
+ */
 @Composable
-fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
+fun LoginScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -33,10 +44,10 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary
+        Icon(
+            painter = painterResource(id = R.drawable.banner),
+            contentDescription = null,
+            tint = Color.Unspecified
         )
 
         Spacer(modifier = Modifier.height(32.dp))

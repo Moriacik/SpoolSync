@@ -11,7 +11,23 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.tasks.await
 
-class OcrViewModel(application: Application) : AndroidViewModel(application) {
+/**
+ * ViewModel pre rozpoznávanie textu z obrázkov pomocou ML Kit OCR.
+ *
+ * @param application Kontext aplikácie potrebný pre AndroidViewModel.
+ */
+class OcrViewModel(
+    application: Application
+) : AndroidViewModel(application) {
+
+    /**
+     * Rozpozná text z orezaného stredu obrázka načítaného z Uri.
+     * Orezáva stred obrázka na veľkosť 100x60 (alebo menej podľa veľkosti obrázka) a použije ML Kit na rozpoznanie textu.
+     *
+     * @param context Kontext na prístup k content resolveru.
+     * @param imageUri Uri obrázka, z ktorého sa má rozpoznať text.
+     * @return Rozpoznaný text alebo null, ak sa obrázok nepodarilo načítať.
+     */
     suspend fun recognizeTextFromCroppedImage(
         context: Context,
         imageUri: Uri

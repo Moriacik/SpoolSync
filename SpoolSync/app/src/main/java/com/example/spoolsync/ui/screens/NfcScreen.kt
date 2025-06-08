@@ -32,6 +32,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Režimi obrazovky pre prácu s NFC tagmi filamentu.
+ */
+enum class FilamentNfcScreenMode {
+    READ, UPDATE, OCR
+}
+
+/**
+ * Obrazovka pre prácu s NFC tagmi filamentu.
+ * Umožňuje čítanie, aktualizáciu alebo získanie ID filamentu pomocou NFC podľa zvoleného režimu.
+ *
+ * @param navController Navigácia v aplikácii.
+ * @param filamentViewModel ViewModel pre správu filamentov.
+ * @param nfcViewModel ViewModel pre operácie s NFC.
+ * @param mode Režim obrazovky.
+ * @param filamentId ID filamentu (voliteľné, používa sa pri aktualizácii).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilamentNfcScreen(
@@ -106,6 +123,7 @@ fun FilamentNfcScreen(
                             nfcId = filamentId
                             coroutineScope.launch {
                                 navController.navigate("filamentView/$filamentId")
+                                filamentViewModel.updateFilamentNfcStatus(filamentId, true)
                             }
                         },
                         onError = { error ->
@@ -291,8 +309,4 @@ fun FilamentNfcScreen(
             }
         }
     }
-}
-
-enum class FilamentNfcScreenMode {
-    READ, UPDATE, OCR
 }

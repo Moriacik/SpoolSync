@@ -9,7 +9,17 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.spoolsync.R
 
+/**
+ * BroadcastReceiver pre prijímanie a zobrazovanie notifikácií o exspirácii filamentu.
+ */
 class NotificationReceiver : BroadcastReceiver() {
+
+    /**
+     * Zobrazí notifikáciu o exspirácii filamentu po prijatí príslušného intentu.
+     *
+     * @param context Kontext aplikácie.
+     * @param intent Prijatý intent s informáciami o filamente.
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onReceive(context: Context, intent: Intent) {
         val filamentId = intent.getStringExtra("filamentId") ?: return
