@@ -28,7 +28,7 @@ import com.google.firebase.ktx.Firebase
  * Definuje všetky navigačné trasy a prepája ich s príslušnými obrazovkami a view modelmi.
  */
 @Composable
-fun SpoolSyncApp() {
+fun SpoolSyncApp(startDestination: String) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val filamentViewModel: FilamentViewModel = viewModel()
@@ -37,7 +37,7 @@ fun SpoolSyncApp() {
 
     NavHost(
         navController = navController,
-        startDestination = "login",
+        startDestination = startDestination,
     ) {
         // Prihlasovanie
         composable("login") {

@@ -36,6 +36,9 @@ class AuthViewModel(
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        val sharedPref = getApplication<Application>().getSharedPreferences("user_prefs", 0)
+                        sharedPref.edit().putString("user_uid", uid).apply()
                         callback(true, null)
                     } else {
                         val exception = task.exception
