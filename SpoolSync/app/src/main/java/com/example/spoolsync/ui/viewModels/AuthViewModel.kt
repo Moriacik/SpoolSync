@@ -6,6 +6,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.apply
+import kotlin.collections.remove
 
 /**
  * ViewModel pre autentifikáciu používateľa.
@@ -93,5 +95,31 @@ class AuthViewModel(
                     onError(task.exception?.localizedMessage ?: "Registration failed")
                 }
             }
+    }
+
+    /**
+     * Získanie aktuálne prihláseného používateľa.
+     *
+     * @param onComplete Funkcia, ktorá sa zavolá s UID používateľa alebo null, ak nie je prihlásený.
+     */
+    fun signOut(onComplete: () -> Unit) {
+        auth.signOut()
+        val sharedPref = getApplication<Application>().getSharedPreferences("user_prefs", 0)
+        sharedPref.edit().remove("user_uid").apply()
+        onComplete()
+    }
+
+    /**
+     * Zmazanie účtu používateľa.
+     * Odstráni používateľský účet a vymaže všetky súvisiace dáta z Firestore.
+     *
+     * @param onComplete Funkcia, ktorá sa zavolá po úspešnom zmazaní účtu.
+     */
+    fun deleteAccount(onComplete: () -> Unit) {
+        auth.currentUser?.delete()?.addOnCompleteListener { task ->
+            val sharedPref = getApplication<Application>().getSharedPreferences("user_prefs", 0)
+            sharedPref.edit().remove("user_uid").apply()
+            onComplete()
+        }
     }
 }

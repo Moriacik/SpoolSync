@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.spoolsync.ui.screens.AccountScreen
 import com.example.spoolsync.ui.viewModels.AuthViewModel
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import com.example.spoolsync.ui.screens.FilamentFormMode
@@ -41,12 +42,18 @@ fun SpoolSyncApp(startDestination: String) {
     ) {
         // Prihlasovanie
         composable("login") {
-            LoginScreen(navController, authViewModel)
+            LoginScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
         }
 
         // Registrácia
         composable("register") {
-            RegisterScreen(navController, authViewModel)
+            RegisterScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
         }
 
         // Zoznam filamentov
@@ -55,6 +62,14 @@ fun SpoolSyncApp(startDestination: String) {
             FilamentsScreen(
                 navController = navController,
                 filamentViewModel = filamentViewModel
+            )
+        }
+
+        // Inoformacie o účte
+        composable("account") {
+            AccountScreen(
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
 

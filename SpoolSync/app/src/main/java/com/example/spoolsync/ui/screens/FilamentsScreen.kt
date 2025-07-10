@@ -60,7 +60,9 @@ fun FilamentsScreen(
                     fontWeight = FontWeight.Bold
                 )},
                 navigationIcon = {
-                    IconButton(onClick = { /* Account action */ }) {
+                    IconButton(
+                        onClick = { navController.navigate("account") })
+                    {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = stringResource(R.string.account)
@@ -68,13 +70,17 @@ fun FilamentsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Notification action */ }) {
+                    IconButton(
+                        onClick = { /* Notification action */ })
+                    {
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = stringResource(R.string.notifications)
                         )
                     }
-                    IconButton(onClick = { /* Settings action */ }) {
+                    IconButton(
+                        onClick = { /* Settings action */ })
+                    {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = stringResource(R.string.settings)

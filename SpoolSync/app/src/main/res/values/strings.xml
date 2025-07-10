@@ -77,4 +77,14 @@
     <string name="filament_alert">Filament Expiration Alert</string>
     <string name="filament_notification">"Your filament is about to expire!"</string>
 
+    // Account strings
+    <string name="change_email">Change Email</string>
+    <string name="change_password">Change Password</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_confirm">Are you sure you want to log out?</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_confirm">Are you sure you want to delete your account? This action cannot be undone.</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="back">back</string>
+
 </resources>

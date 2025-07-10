@@ -510,3 +510,35 @@ fun DecorativeCornerDividers(
         )
     }
 }
+
+/**
+ * Komponent pre zobrazenie akcií účtu s ikonou a textom.
+ *
+ * @param icon Ikona akcie.
+ * @param label Text akcie.
+ * @param onClick Funkcia, ktorá sa zavolá pri kliknutí na akciu.
+ * @param color Farba kontentu akcie (predvolená je čierna).
+ */
+@Composable
+fun AccountActionButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    color: Color = colorResource(R.color.dark_gray)
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        shape = RoundedCornerShape(25.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorResource(R.color.light_gray),
+            contentColor = color
+        )
+    ) {
+        Icon(icon, contentDescription = null)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(label)
+    }
+}
