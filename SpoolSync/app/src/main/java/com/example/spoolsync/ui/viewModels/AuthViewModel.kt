@@ -2,6 +2,7 @@ package com.example.spoolsync.ui.viewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -120,6 +121,70 @@ class AuthViewModel(
             val sharedPref = getApplication<Application>().getSharedPreferences("user_prefs", 0)
             sharedPref.edit().remove("user_uid").apply()
             onComplete()
+        }
+    }
+
+    /**
+     * Zmena mailu používateľa.
+     * Vyžaduje aktuálne heslo na overenie a potom aktualizuje mail na nový.
+     *
+     * @param currentPassword Aktuálne heslo používateľa.
+     * @param newEmail Nový mail, ktorý sa má nastaviť.
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom operácie.
+     */
+    fun changeEmail(currentPassword: String, newEmail: String, callback: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        val email = user?.email
+        if (user == null || email == null) {
+            callback(false, "User not logged in")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, currentPassword)
+        user.reauthenticate(credential).addOnCompleteListener { authTask ->
+            if (authTask.isSuccessful) {
+                user.updateEmail(newEmail).addOnCompleteListener { updateTask ->
+                    if (updateTask.isSuccessful) {
+                        callback(true, null)
+                    } else {
+                        callback(false, updateTask.exception?.localizedMessage ?: "Failed to update email")
+                    }
+                }
+            } else {
+                callback(false, authTask.exception?.localizedMessage ?: "Re-authentication failed")
+            }
+        }
+    }
+
+    /**
+     * Zmena hesla používateľa.
+     * Vyžaduje aktuálne heslo na overenie a potom aktualizuje heslo na nové.
+     *
+     * @param currentPassword Aktuálne heslo používateľa.
+     * @param newPassword Nové heslo, ktoré sa má nastaviť.
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom operácie.
+     */
+    fun changePassword(currentPassword: String, newPassword: String, callback: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        val email = user?.email
+        if (user == null || email == null) {
+            callback(false, "User not logged in")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, currentPassword)
+        user.reauthenticate(credential).addOnCompleteListener { authTask ->
+            if (authTask.isSuccessful) {
+                user.updatePassword(newPassword).addOnCompleteListener { updateTask ->
+                    if (updateTask.isSuccessful) {
+                        callback(true, null)
+                    } else {
+                        callback(false, updateTask.exception?.localizedMessage ?: "Failed to update password")
+                    }
+                }
+            } else {
+                callback(false, authTask.exception?.localizedMessage ?: "Re-authentication failed")
+            }
         }
     }
 }
