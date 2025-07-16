@@ -118,13 +118,6 @@ fun AccountScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(R.string.actions),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
-                )
 
                 AccountActionButton(
                     icon = Icons.Default.Email,
@@ -149,40 +142,6 @@ fun AccountScreen(
                     label = stringResource(R.string.delete_account),
                     onClick = { showDeleteDialog = true },
                     color = Color.Red
-                )
-            }
-
-            Spacer(modifier = Modifier.height(56.dp))
-
-            Column (
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(R.string.application),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                AccountActionButton(
-                    icon = Icons.Default.Person,
-                    label = stringResource(R.string.contact_support),
-                    onClick = {
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:support@example.com")
-                            putExtra(Intent.EXTRA_SUBJECT, "SpoolSync Support")
-                        }
-                        context.startActivity(intent)
-                    }
-                )
-
-                Text(
-                    text = "SpoolSync ${stringResource(R.string.version)} : 1.0.0",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colorResource(R.color.gray)
                 )
             }
         }

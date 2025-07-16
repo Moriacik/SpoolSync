@@ -19,8 +19,10 @@ import com.example.spoolsync.ui.screens.FilamentNfcScreen
 import com.example.spoolsync.ui.screens.FilamentNfcScreenMode
 import com.example.spoolsync.ui.screens.OcrScreen
 import com.example.spoolsync.ui.screens.PrintScreen
+import com.example.spoolsync.ui.screens.SettingsScreen
 import com.example.spoolsync.ui.viewModels.NfcViewModel
 import com.example.spoolsync.ui.viewModels.OcrViewModel
+import com.example.spoolsync.ui.viewModels.SettingsViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -32,6 +34,7 @@ import com.google.firebase.ktx.Firebase
 fun SpoolSyncApp(startDestination: String) {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
+    val settingsViewModel: SettingsViewModel = viewModel()
     val filamentViewModel: FilamentViewModel = viewModel()
     val ocrViewModel: OcrViewModel = viewModel()
     val nfcViewModel: NfcViewModel = viewModel()
@@ -70,6 +73,14 @@ fun SpoolSyncApp(startDestination: String) {
             AccountScreen(
                 navController = navController,
                 authViewModel = authViewModel
+            )
+        }
+
+        // Nastavenia aplikácie
+        composable("settings") {
+            SettingsScreen(
+                navController = navController,
+                settingsViewModel = settingsViewModel
             )
         }
 

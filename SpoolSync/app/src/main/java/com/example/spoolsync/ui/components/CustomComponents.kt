@@ -58,6 +58,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Typy vstupov, ktoré môžu byť použité v komponente FormWithIcon.
@@ -540,5 +541,33 @@ fun AccountActionButton(
         Icon(icon, contentDescription = null)
         Spacer(modifier = Modifier.width(8.dp))
         Text(label)
+    }
+}
+
+@Composable
+fun SettingsActionButton(
+    icon: ImageVector? = null,
+    label: String,
+    trailing: @Composable (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .let { if (onClick != null) it.clickable { onClick() } else it }
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            Icon(icon, contentDescription = null)
+            Spacer(modifier = Modifier.width(16.dp))
+        }
+        Text(
+            text = label,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        trailing?.invoke()
     }
 }

@@ -1,0 +1,105 @@
+<resources>
+    <string name="app_name">SpoolSync</string>
+    <string name="filaments">Filamenty</string>
+    <string name="info">Info</string>
+    <string name="print">Tlač</string>
+
+    <!-- Login/Register strings -->
+    <string name="login">Prihlásiť sa</string>
+    <string name="register">Registrovať sa</string>
+    <string name="email">Email</string>
+    <string name="password">Heslo</string>
+    <string name="re_password">Zadajte heslo znova</string>
+    <string name="error1">Nie všetky polia sú vyplnené.</string>
+    <string name="error2">Neplatné prihlasovacie údaje.</string>
+    <string name="error3">Heslá sa nezhodujú.</string>
+    <string name="error4">Heslo musí mať aspoň 8 znakov.</string>
+    <string name="error5">Registrácia zlyhala.</string>
+    <string name="to_register">Nemáte účet? Zaregistrujte sa.</string>
+    <string name="to_login">Späť na prihlásenie.</string>
+
+    <!-- Filament Form strings -->
+    <string name="edit">Upraviť</string>
+    <string name="photo">Fotka</string>
+    <string name="type">Typ</string>
+    <string name="brand">Značka</string>
+    <string name="note">Poznámka</string>
+    <string name="optional_note">Voliteľná poznámka o filamente…</string>
+    <string name="submit">Potvrdiť</string>
+    <string name="cancel">Zrušiť</string>
+    <string name="not_specified">Nešpecifikované</string>
+    <string name="filament_status">Ikona vlastnosti</string>
+    <string name="scanned">Načítané</string>
+    <string name="not_scanned">Nenačítané</string>
+    <string name="update_tag">Aktualizovať tag</string>
+    <string name="weight_in_grams">Hmotnosť v gramoch</string>
+    <string name="select_color">Vyberte farbu</string>
+    <string name="select_date">Vyberte dátum</string>
+    <string name="delete_filament">Odstrániť filament</string>
+
+    <string-array name="filament_status_options">
+        <item>Otvorené</item>
+        <item>Zatvorené</item>
+        <item>Používa sa</item>
+    </string-array>
+
+    <!-- Filaments strings -->
+    <string name="account">Účet</string>
+    <string name="notifications">Notifikácie</string>
+    <string name="settings">Nastavenia</string>
+    <string name="add">Pridať</string>
+    <string name="categories">Kategórie</string>
+    <string name="all">Všetko</string>
+
+    <!-- Nfc strings -->
+    <string name="nfc">NFC</string>
+    <string name="place_device_close_to_tag">Priložte zariadenie k tagu</string>
+    <string name="or">alebo</string>
+    <string name="enter_id_manually">Zadajte ID manuálne</string>
+    <string name="filament_not_found">Filament nebol nájdený</string>
+    <string name="nfc_error1">Chyba pri čítaní NFC tagu: </string>
+    <string name="nfc_error2">NFC tag nie je zapisovateľný</string>
+    <string name="nfc_error3">Dáta sú príliš veľké pre NFC tag</string>
+    <string name="nfc_error4">Tag nepodporuje NDEF</string>
+    <string name="nfc_error5">Chyba pri aktualizácii NFC tagu: </string>
+    <string name="nfc_error6">Tag je prázdny</string>
+
+    <!-- Print strings -->
+    <string name="selected_image">Vybraný obrázok</string>
+    <string name="filament_information">Informácie o filamente</string>
+    <string name="calculate_new_weight">Vypočítať novú hmotnosť</string>
+    <string name="actual_weight">Aktuálna hmotnosť</string>
+    <string name="scanned_weight">Načítaná hmotnosť</string>
+    <string name="new_weight">Nová hmotnosť</string>
+    <string name="negative_weight">Zadajte platné kladné číslo</string>
+
+    <!-- Notifications strings -->
+    <string name="filament_alert">Upozornenie na expiráciu filamentu</string>
+    <string name="filament_notification">Váš filament čoskoro exspiruje!</string>
+
+    <!-- Account strings -->
+    <string name="back">späť</string>
+    <string name="actions">Akcie</string>
+    <string name="change_email">Zmeniť email</string>
+    <string name="change_password">Zmeniť heslo</string>
+    <string name="sign_out">Odhlásiť sa</string>
+    <string name="sign_out_confirm">Naozaj sa chcete odhlásiť?</string>
+    <string name="delete_account">Zmazať účet</string>
+    <string name="delete_account_confirm">Naozaj chcete zmazať svoj účet? Táto akcia je nevratná.</string>
+    <string name="current_password">Aktuálne heslo</string>
+    <string name="new_email">Nový email</string>
+    <string name="email_changed">Email bol úspešne zmenený.</string>
+    <string name="new_password">Nové heslo</string>
+    <string name="password_changed">Heslo bolo úspešne zmenené.</string>
+
+    <!-- Settings strings -->
+    <string name="theme">Téma</string>
+    <string name="dark_mode">Tmavý režim</string>
+    <string name="language">Jazyk</string>
+    <string name="change_language">Zmeniť jazyk</string>
+    <string name="privacy_security">Súkromie a bezpečnosť</string>
+    <string name="biometric_auth">Biometrická autentifikácia</string>
+    <string name="manage_permissions">Spravovať povolenia</string>
+    <string name="account_settings">Nastavenia účtu</string>
+    <string name="about">O aplikácii</string>
+</resources>

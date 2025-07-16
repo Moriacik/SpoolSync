@@ -79,7 +79,7 @@ fun FilamentsScreen(
                         )
                     }
                     IconButton(
-                        onClick = { /* Settings action */ })
+                        onClick = { navController.navigate("settings") })
                     {
                         Icon(
                             imageVector = Icons.Default.Settings,

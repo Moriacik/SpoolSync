@@ -4,7 +4,7 @@
     <string name="info">Info</string>
     <string name="print">Print</string>
 
-    // Login/Register strings
+    <!-- Login/Register strings -->
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="email">Email</string>
@@ -18,7 +18,7 @@
     <string name="to_register">"Don't have an account? Sign up."</string>
     <string name="to_login">"Back to Login."</string>
 
-    // Filament Form strings
+    <!-- Filament Form strings -->
     <string name="edit">Edit</string>
     <string name="photo">Photo</string>
     <string name="type">Type</string>
@@ -43,7 +43,7 @@
         <item>Using</item>
     </string-array>
 
-    // Filaments strings
+    <!-- Filaments strings -->
     <string name="account">Account</string>
     <string name="notifications">Notifications</string>a
     <string name="settings">Settings</string>
@@ -51,7 +51,7 @@
     <string name="categories">Categories</string>
     <string name="all">All</string>
 
-    // Nfc strings
+    <!-- Nfc strings -->
     <string name="nfc">NFC</string>
     <string name="place_device_close_to_tag">Place device close to tag</string>
     <string name="or">or</string>
@@ -64,7 +64,7 @@
     <string name="nfc_error5">Error updating NFC tag: </string>
     <string name="nfc_error6">Tag is null</string>
 
-    // Print strings
+    <!-- Print strings -->
     <string name="selected_image">Selected image</string>
     <string name="filament_information">Filament Information</string>
     <string name="calculate_new_weight">Calculate New Weight</string>
@@ -73,11 +73,11 @@
     <string name="new_weight">New Weight</string>
     <string name="negative_weight">"Please enter a valid positive number"</string>
 
-    // Notifications strings
+    <!-- Notifications strings -->
     <string name="filament_alert">Filament Expiration Alert</string>
     <string name="filament_notification">"Your filament is about to expire!"</string>
 
-    // Account strings
+    <!-- Account strings -->
     <string name="back">back</string>
     <string name="actions">Actions</string>
     <string name="change_email">Change Email</string>
@@ -86,14 +86,20 @@
     <string name="sign_out_confirm">Are you sure you want to log out?</string>
     <string name="delete_account">Delete Account</string>
     <string name="delete_account_confirm">Are you sure you want to delete your account? This action cannot be undone.</string>
-    <string name="application">Application</string>
-    <string name="contact_support">Contact Support</string>
-    <string name="version">Version</string>
     <string name="current_password">Current Password</string>
     <string name="new_email">New Email</string>
     <string name="email_changed">Email changed successfully.</string>
     <string name="new_password">New Password</string>
     <string name="password_changed">Password changed successfully.</string>
 
-
+    <!-- Settings strings -->
+    <string name="theme">Theme</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="language">Language</string>
+    <string name="change_language">Change Language</string>
+    <string name="privacy_security">Privacy And Security</string>
+    <string name="biometric_auth">Biometric Authentication</string>
+    <string name="manage_permissions">Manage Permissions</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="about">About</string>
 </resources>
