@@ -59,6 +59,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 
 /**
  * Typy vstupov, ktoré môžu byť použité v komponente FormWithIcon.
@@ -156,11 +157,11 @@ fun <T> FormWithIcon(
                                 onClick = {
                                     navController.navigate("filamentNfcUpdate/${id}")
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
+                                colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.buttonBackground),
                                 modifier = Modifier
                                     .padding(end = 10.dp)
                             ) {
-                                Text(stringResource(R.string.update_tag))
+                                Text(stringResource(R.string.update_tag), color = colorResource(R.color.white))
                             }
                         }
                     }
@@ -177,7 +178,6 @@ fun <T> FormWithIcon(
 
                 InputType.WEIGHT_FIELD -> Text(
                     text = "$value g",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -189,7 +189,6 @@ fun <T> FormWithIcon(
 
                 else -> Text(
                     text = value.toString().ifEmpty { stringResource(R.string.not_specified) },
-                    style = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -215,7 +214,7 @@ fun WeightInputField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(end = 12.dp)
-            .background(colorResource(R.color.light_gray), RoundedCornerShape(10.dp))
+            .background(SpoolSyncTheme.colors.textBoxBackground, RoundedCornerShape(10.dp))
     ) {
         TextField(
             value = inputWeight,
@@ -225,14 +224,11 @@ fun WeightInputField(
                 inputWeight = numericValue
                 onWeightChange(numericValue.toIntOrNull() ?: 0)
             },
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = colorResource(R.color.black)),
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                focusedTextColor = colorResource(R.color.black),
-                unfocusedTextColor = colorResource(R.color.black)
             ),
             modifier = Modifier
                 .weight(1f),
@@ -284,8 +280,8 @@ fun DropdownField(
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedContainerColor = colorResource(R.color.light_gray),
-                    unfocusedContainerColor = colorResource(R.color.light_gray)
+                    focusedContainerColor = SpoolSyncTheme.colors.textBoxBackground,
+                    unfocusedContainerColor = SpoolSyncTheme.colors.textBoxBackground
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -293,7 +289,7 @@ fun DropdownField(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .border(1.dp, colorResource(R.color.light_gray))
+                    .border(1.dp, SpoolSyncTheme.colors.textBoxBackground)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
@@ -303,7 +299,7 @@ fun DropdownField(
                             expanded = false
                         },
                         modifier = Modifier
-                            .background(colorResource(R.color.white))
+                            .background(SpoolSyncTheme.colors.textBoxBackground)
                             .padding(8.dp)
                     )
                 }
@@ -330,7 +326,7 @@ fun ColorPicker(
         modifier = Modifier
             .size(50.dp)
             .background(selectedColor, CircleShape)
-            .border(2.dp, Color.DarkGray, CircleShape)
+            .border(2.dp, SpoolSyncTheme.colors.filamentCircleBorder, CircleShape)
             .clickable { showColorPicker = true }
     ) {
         if (showColorPicker) {
@@ -338,7 +334,7 @@ fun ColorPicker(
                 onDismissRequest = { showColorPicker = false },
                 confirmButton = {
                     TextButton(onClick = { showColorPicker = false }) {
-                        Text(stringResource(R.string.submit))
+                        Text(stringResource(R.string.submit), color = colorResource(R.color.white))
                     }
                 },
                 title = { Text(stringResource(R.string.select_color)) },
@@ -381,7 +377,7 @@ fun DatePicker(
             .fillMaxWidth()
             .height(52.dp)
             .padding(end = 12.dp)
-            .background(colorResource(R.color.light_gray), RoundedCornerShape(10.dp))
+            .background(SpoolSyncTheme.colors.textBoxBackground, RoundedCornerShape(10.dp))
     ){
         Text(
             text = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
@@ -413,11 +409,11 @@ fun DatePicker(
                             }
                             showDatePicker = false
                         }
-                    ) { Text(stringResource(R.string.submit)) }
+                    ) { Text(stringResource(R.string.submit), color = colorResource(R.color.white)) }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) {
-                        Text(stringResource(R.string.cancel))
+                        Text(stringResource(R.string.cancel), color = colorResource(R.color.white))
                     }
                 }
             ) {
@@ -522,7 +518,7 @@ fun DecorativeCornerDividers(
  */
 @Composable
 fun AccountActionButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     label: String,
     onClick: () -> Unit,
     color: Color = colorResource(R.color.dark_gray)

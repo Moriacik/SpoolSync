@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
                     val isDarkMode = sharedPref.getBoolean("dark_mode", false)
                     val userUid = sharedPref.getString("user_uid", null)
                     val startDestination = if (userUid != null) "filaments" else "login"
-                    SpoolSyncTheme(isDarkMode) {
+                    SpoolSyncTheme(useDarkTheme = isDarkMode) {
                         SpoolSyncApp(startDestination)
                 }
             }

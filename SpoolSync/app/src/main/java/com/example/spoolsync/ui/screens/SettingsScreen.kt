@@ -77,7 +77,8 @@ fun SettingsScreen(
                     trailing = {
                         Switch(
                             checked = isDarkMode,
-                            onCheckedChange = { settingsViewModel.setDarkMode(it) }
+                            onCheckedChange = { settingsViewModel.setDarkMode(it) },
+                            modifier = Modifier.padding(end = 12.dp)
                         )
                     }
                 )
@@ -87,7 +88,6 @@ fun SettingsScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = stringResource(R.string.language),

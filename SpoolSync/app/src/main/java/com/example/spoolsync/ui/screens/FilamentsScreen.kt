@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import com.example.spoolsync.R
 import com.example.spoolsync.data.model.Filament
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 
 /**
  * Hlavná obrazovka pre správu filamentov.
@@ -91,7 +92,7 @@ fun FilamentsScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colorResource(R.color.nav_bar)
+                containerColor = SpoolSyncTheme.colors.navBar
             ) {
                 NavigationBar(
                     containerColor = Color.Transparent
@@ -103,6 +104,7 @@ fun FilamentsScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
+                                tint = SpoolSyncTheme.colors.navBarIconSelected,
                                 modifier = Modifier.size(60.dp),
                             )
                         },
@@ -115,7 +117,7 @@ fun FilamentsScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
-                                tint = colorResource(R.color.gray),
+                                tint = SpoolSyncTheme.colors.navBarIcon,
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -130,7 +132,7 @@ fun FilamentsScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
-                                tint = colorResource(R.color.gray),
+                                tint = SpoolSyncTheme.colors.navBarIcon,
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -165,7 +167,7 @@ fun FilamentsScreen(
 
                 items(filteredFilaments) { filament ->
                     FilamentItem(filament, navController)
-                    Divider(color = colorResource(R.color.light_gray))
+                    Divider(color = SpoolSyncTheme.colors.divider)
                 }
             }
 
@@ -224,12 +226,12 @@ fun CategoryChip(
             modifier = Modifier
                 .size(96.dp)
                 .background(
-                    color = colorResource(R.color.light_gray),
+                    color = SpoolSyncTheme.colors.chipBackground,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .border(
-                    width = if (isSelected) 2.dp else 0.dp,
-                    color = colorResource(R.color.dark_gray),
+                    width = 2.dp,
+                    color = if (isSelected) SpoolSyncTheme.colors.chipBorder else SpoolSyncTheme.colors.chipBackground,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable { onCategorySelected(category) },
@@ -275,7 +277,7 @@ fun FilamentItem(filament: Filament, navController: NavController) {
         Box(
             modifier = Modifier
                 .size(50.dp)
-                .border(2.dp, colorResource(R.color.dark_gray), CircleShape)
+                .border(2.dp, SpoolSyncTheme.colors.filamentCircleBorder, CircleShape)
                 .background(Color(filament.color.toArgb()), shape = CircleShape)
         )
 

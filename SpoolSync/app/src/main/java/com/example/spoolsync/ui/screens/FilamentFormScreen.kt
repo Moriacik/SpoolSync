@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.spoolsync.data.model.Filament
 import com.example.spoolsync.ui.components.FormWithIcon
 import com.example.spoolsync.ui.components.InputType
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import java.time.LocalDate
 
@@ -55,7 +56,7 @@ fun FilamentFormScreen(
     initialFilament: Filament? = null,
     filamentViewModel: FilamentViewModel
 ) {
-    var defaultColor = colorResource(R.color.default_color)
+    var defaultColor = colorResource(R.color.white)
     var filament by remember { mutableStateOf(initialFilament ?: Filament("", "", "", 0, "", defaultColor, LocalDate.now(), true, "")) }
     val originalFilament = remember { initialFilament ?: Filament("", "", "", 0, "", defaultColor, LocalDate.now(), true, "") }
     var isEditing by remember { mutableStateOf(mode == EDIT || mode == ADD) }
@@ -84,7 +85,7 @@ fun FilamentFormScreen(
             )
         },
         bottomBar = {
-            BottomAppBar(containerColor = colorResource(R.color.nav_bar)) {
+            BottomAppBar(containerColor = SpoolSyncTheme.colors.navBar) {
                 NavigationBar(
                     containerColor = Color.Transparent
                 ) {
@@ -95,7 +96,7 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
-                                tint = colorResource(R.color.gray),
+                                tint = SpoolSyncTheme.colors.navBarIcon,
                                 modifier = Modifier.size(48.dp),
                             )
                         },
@@ -108,6 +109,7 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
+                                tint = SpoolSyncTheme.colors.navBarIconSelected,
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -120,7 +122,7 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
-                                tint = colorResource(R.color.gray),
+                                tint = SpoolSyncTheme.colors.navBarIcon,
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -139,20 +141,20 @@ fun FilamentFormScreen(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
-                    .background(colorResource(R.color.light_gray)),
+                    .background(SpoolSyncTheme.colors.filamentPhotoBorder),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
                         .padding(0.dp, 5.dp, 0.dp, 5.dp)
                         .fillMaxSize()
-                        .background(colorResource(R.color.white)),
+                        .background(SpoolSyncTheme.colors.filamentPhotoBackground),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
+                    Icon(
                         painter = painterResource(R.drawable.ic_filament),
                         contentDescription = stringResource(R.string.photo),
-                        contentScale = ContentScale.Fit,
+                        tint = SpoolSyncTheme.colors.filamentPhotoIcon,
                         modifier = Modifier.size(200.dp)
                     )
                 }
@@ -174,8 +176,6 @@ fun FilamentFormScreen(
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = colorResource(R.color.black),
-                            unfocusedTextColor = colorResource(R.color.black)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -193,8 +193,6 @@ fun FilamentFormScreen(
                             unfocusedIndicatorColor = Color.Transparent,
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = colorResource(R.color.black),
-                            unfocusedTextColor = colorResource(R.color.black)
                         ),
                         modifier = Modifier
                             .weight(1f)
@@ -210,7 +208,6 @@ fun FilamentFormScreen(
                     Text(
                         text = if (filament.type == "") stringResource(R.string.type) else filament.type,
                         fontSize = 40.sp,
-                        color = colorResource(R.color.black),
                         modifier = Modifier
                             .weight(1f)
                             .height(50.dp)
@@ -218,7 +215,6 @@ fun FilamentFormScreen(
                     Text(
                         text = if (filament.brand == "") stringResource(R.string.brand) else filament.brand,
                         fontSize = 20.sp,
-                        color = colorResource(R.color.black),
                         textAlign = TextAlign.End,
                         modifier = Modifier
                             .weight(1f)
@@ -226,6 +222,7 @@ fun FilamentFormScreen(
                     )
                 }
             }
+
             Divider(modifier = Modifier.padding(vertical = 4.dp))
 
             Column(
@@ -255,7 +252,7 @@ fun FilamentFormScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .heightIn(min = 80.dp)
-                            .background(colorResource(R.color.light_gray), RoundedCornerShape(8.dp))
+                            .background(SpoolSyncTheme.colors.noteBox, RoundedCornerShape(8.dp))
                     ) {
                         TextField(
                             value = filament.note,
@@ -266,9 +263,7 @@ fun FilamentFormScreen(
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent,
                                 focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedTextColor = colorResource(R.color.black),
-                                unfocusedTextColor = colorResource(R.color.black)
+                                unfocusedContainerColor = Color.Transparent
                             ),
                             modifier = Modifier
                                 .fillMaxSize()
@@ -293,11 +288,11 @@ fun FilamentFormScreen(
                                     filamentViewModel.saveExistfilament(filament)
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
+                            colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.buttonBackground),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.submit))
-                            Text(stringResource(R.string.submit))
+                            Icon(Icons.Default.Check, contentDescription = stringResource(R.string.submit), tint = colorResource(R.color.white))
+                            Text(stringResource(R.string.submit), color = colorResource(R.color.white))
                         }
 
                         Spacer(modifier = Modifier.width(16.dp))
@@ -314,8 +309,8 @@ fun FilamentFormScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.red)),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel))
-                            Text(stringResource(R.string.cancel))
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cancel), tint = colorResource(R.color.white))
+                            Text(stringResource(R.string.cancel), color = colorResource(R.color.white))
                         }
                     }
                 } else {
@@ -324,7 +319,7 @@ fun FilamentFormScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .heightIn(min = 80.dp)
-                            .background(colorResource(R.color.light_gray), RoundedCornerShape(8.dp))
+                            .background(SpoolSyncTheme.colors.noteBox, RoundedCornerShape(8.dp))
                     ) {
                         Text(
                             text = filament.note,
@@ -354,11 +349,10 @@ fun FilamentFormScreen(
                                 .width(280.dp),
                             shape = RoundedCornerShape(25.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = colorResource(R.color.red),
-                                contentColor = colorResource(R.color.white)
+                                containerColor = colorResource(R.color.red)
                             )
                         ) {
-                            Text(stringResource(R.string.delete_filament))
+                            Text(stringResource(R.string.delete_filament), color = colorResource(R.color.white))
                         }
                     }
                 }

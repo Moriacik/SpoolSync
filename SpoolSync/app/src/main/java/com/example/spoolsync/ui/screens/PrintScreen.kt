@@ -116,7 +116,7 @@ fun PrintScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colorResource(R.color.nav_bar)
+                containerColor = colorResource(R.color.nav_bar_light)
             ) {
                 NavigationBar(
                     containerColor = Color.Transparent
