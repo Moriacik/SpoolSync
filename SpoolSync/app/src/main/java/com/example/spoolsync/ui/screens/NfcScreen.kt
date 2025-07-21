@@ -1,17 +1,13 @@
 package com.example.spoolsync.ui.screens
 
 import android.app.Activity
-import android.nfc.NdefMessage
-import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.Ndef
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -25,8 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spoolsync.R
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.NfcViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -169,7 +165,7 @@ fun FilamentNfcScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colorResource(R.color.nav_bar_light)
+                containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray
             ) {
                 NavigationBar(
                     containerColor = Color.Transparent
@@ -194,6 +190,7 @@ fun FilamentNfcScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
+                                tint = SpoolSyncTheme.colors.blackWhite,
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -223,9 +220,10 @@ fun FilamentNfcScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
+            Icon(
                 painter = painterResource(R.drawable.nfc),
                 contentDescription = stringResource(R.string.nfc),
+                tint = SpoolSyncTheme.colors.blackWhite,
                 modifier = Modifier
                     .size(200.dp)
                     .padding(16.dp)
@@ -283,10 +281,7 @@ fun FilamentNfcScreen(
                         .height(50.dp)
                         .width(280.dp),
                     shape = RoundedCornerShape(25.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(R.color.light_gray),
-                        contentColor = colorResource(R.color.dark_gray)
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
@@ -295,7 +290,7 @@ fun FilamentNfcScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text(stringResource(R.string.submit))
+                        Text(stringResource(R.string.submit), color = colorResource(R.color.white))
                     }
                 }
             }

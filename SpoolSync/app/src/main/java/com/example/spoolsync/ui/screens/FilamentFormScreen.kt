@@ -1,6 +1,5 @@
 package com.example.spoolsync.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,10 +8,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -85,7 +84,7 @@ fun FilamentFormScreen(
             )
         },
         bottomBar = {
-            BottomAppBar(containerColor = SpoolSyncTheme.colors.navBar) {
+            BottomAppBar(containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray) {
                 NavigationBar(
                     containerColor = Color.Transparent
                 ) {
@@ -96,7 +95,7 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
-                                tint = SpoolSyncTheme.colors.navBarIcon,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(48.dp),
                             )
                         },
@@ -109,7 +108,7 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
-                                tint = SpoolSyncTheme.colors.navBarIconSelected,
+                                tint = SpoolSyncTheme.colors.blackWhite,
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -122,7 +121,7 @@ fun FilamentFormScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
-                                tint = SpoolSyncTheme.colors.navBarIcon,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -141,20 +140,20 @@ fun FilamentFormScreen(
                 modifier = Modifier
                     .height(200.dp)
                     .fillMaxWidth()
-                    .background(SpoolSyncTheme.colors.filamentPhotoBorder),
+                    .background(SpoolSyncTheme.colors.lightGrayDarkGray),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
                         .padding(0.dp, 5.dp, 0.dp, 5.dp)
                         .fillMaxSize()
-                        .background(SpoolSyncTheme.colors.filamentPhotoBackground),
+                        .background(SpoolSyncTheme.colors.whiteDarkerGray),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_filament),
                         contentDescription = stringResource(R.string.photo),
-                        tint = SpoolSyncTheme.colors.filamentPhotoIcon,
+                        tint = SpoolSyncTheme.colors.blackWhite,
                         modifier = Modifier.size(200.dp)
                     )
                 }
@@ -223,7 +222,7 @@ fun FilamentFormScreen(
                 }
             }
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             Column(
                 modifier = Modifier
@@ -237,7 +236,7 @@ fun FilamentFormScreen(
                     FilamentInfoDisplay(filament = filament, navController = navController)
                 }
 
-                Divider(modifier = Modifier.padding(vertical = 4.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                 Text(
                     text = stringResource(R.string.note),
@@ -252,7 +251,7 @@ fun FilamentFormScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .heightIn(min = 80.dp)
-                            .background(SpoolSyncTheme.colors.noteBox, RoundedCornerShape(8.dp))
+                            .background(SpoolSyncTheme.colors.lightGrayGray, RoundedCornerShape(8.dp))
                     ) {
                         TextField(
                             value = filament.note,
@@ -271,7 +270,7 @@ fun FilamentFormScreen(
                         )
                     }
 
-                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                     Row(
                         modifier = Modifier
@@ -288,7 +287,7 @@ fun FilamentFormScreen(
                                     filamentViewModel.saveExistfilament(filament)
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.buttonBackground),
+                            colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(Icons.Default.Check, contentDescription = stringResource(R.string.submit), tint = colorResource(R.color.white))
@@ -319,7 +318,7 @@ fun FilamentFormScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .heightIn(min = 80.dp)
-                            .background(SpoolSyncTheme.colors.noteBox, RoundedCornerShape(8.dp))
+                            .background(SpoolSyncTheme.colors.lightGrayGray, RoundedCornerShape(8.dp))
                     ) {
                         Text(
                             text = filament.note,
@@ -331,7 +330,7 @@ fun FilamentFormScreen(
                         )
                     }
 
-                    Divider(modifier = Modifier.padding(4.dp, 12.dp))
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                     Row (
                         modifier = Modifier
@@ -417,7 +416,7 @@ private fun EditableFilamentForm(
             isEditable = true
         )
 
-        Divider(modifier = Modifier.padding(vertical = 4.dp))
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_nfc),
@@ -484,7 +483,7 @@ private fun FilamentInfoDisplay(
             isEditable = false
         )
 
-        Divider(modifier = Modifier.padding(vertical = 4.dp))
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
         FormWithIcon(
             icon = painterResource(R.drawable.ic_nfc),

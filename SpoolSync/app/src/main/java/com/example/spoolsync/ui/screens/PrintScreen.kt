@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -60,6 +61,7 @@ import com.example.spoolsync.data.model.Filament
 import com.example.spoolsync.ui.components.DecorativeCornerDividers
 import com.example.spoolsync.ui.components.FormWithIcon
 import com.example.spoolsync.ui.components.InputType
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 
 /**
@@ -116,7 +118,7 @@ fun PrintScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colorResource(R.color.nav_bar_light)
+                containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray
             ) {
                 NavigationBar(
                     containerColor = Color.Transparent
@@ -128,7 +130,7 @@ fun PrintScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(48.dp),
                             )
                         },
@@ -143,7 +145,7 @@ fun PrintScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -158,6 +160,7 @@ fun PrintScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
+                                tint = SpoolSyncTheme.colors.blackWhite,
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -215,7 +218,7 @@ fun PrintScreen(
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             Row(
                 modifier = Modifier
@@ -259,7 +262,7 @@ fun PrintScreen(
                 isEditable = false
             )
 
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             Text(
                 text = stringResource(R.string.calculate_new_weight),
@@ -355,7 +358,7 @@ fun PrintScreen(
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.light_gray)),
+                        colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .width(250.dp)

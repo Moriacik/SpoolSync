@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
 import com.example.spoolsync.ui.components.DecorativeCornerDividers
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.OcrViewModel
 import kotlinx.coroutines.launch
 import kotlin.toString
@@ -127,7 +128,7 @@ fun OcrScreen(
         },
         bottomBar = {
             BottomAppBar(
-                containerColor = colorResource(R.color.nav_bar_light)
+                containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray
             ) {
                 NavigationBar(
                     containerColor = Color.Transparent
@@ -139,7 +140,7 @@ fun OcrScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_filament),
                                 contentDescription = stringResource(R.string.filaments),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(48.dp),
                             )
                         },
@@ -154,7 +155,7 @@ fun OcrScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_info),
                                 contentDescription = stringResource(R.string.info),
-                                tint = Color.Gray,
+                                tint = colorResource(R.color.gray),
                                 modifier = Modifier.size(32.dp)
                             )
                         },
@@ -169,6 +170,7 @@ fun OcrScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_printer),
                                 contentDescription = stringResource(R.string.print),
+                                tint = SpoolSyncTheme.colors.blackWhite,
                                 modifier = Modifier.size(48.dp)
                             )
                         },
@@ -196,8 +198,8 @@ fun OcrScreen(
                     modifier = Modifier
                         .size(300.dp)
                         .padding(16.dp)
-                        .background(Color.White)
-                        .border(2.dp, colorResource(R.color.light_gray))
+                        .background(SpoolSyncTheme.colors.whiteGray)
+                        .border(2.dp, SpoolSyncTheme.colors.lightGrayWhite)
                 ) {
                     Box(
                         modifier = Modifier
@@ -219,7 +221,7 @@ fun OcrScreen(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(100.dp)
-                        .background(Color.LightGray, shape = CircleShape)
+                        .background(SpoolSyncTheme.colors.lightGrayGray, shape = CircleShape)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,
@@ -231,7 +233,7 @@ fun OcrScreen(
                             onClick = {
                                 imagePickerLauncher.launch("image/*")
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                            colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),
                             shape = CircleShape,
                             modifier = Modifier.size(80.dp)
                         ) {

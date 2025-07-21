@@ -1,5 +1,6 @@
 package com.example.spoolsync.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.AuthViewModel
 
 /**
@@ -40,12 +42,13 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.banner),
+            painter = painterResource(id = R.drawable.banner_light),
             contentDescription = null,
             tint = Color.Unspecified
         )
@@ -122,14 +125,13 @@ fun LoginScreen(
                 .height(50.dp),
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.light_gray),
-                contentColor = colorResource(R.color.dark_gray)
+                containerColor = SpoolSyncTheme.colors.lightGrayGray
             )
         ) {
             if (isLoading) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(color = colorResource(R.color.white))
             } else {
-                Text(stringResource(R.string.login))
+                Text(stringResource(R.string.login), color = colorResource(R.color.white))
             }
         }
 
@@ -139,7 +141,7 @@ fun LoginScreen(
         ) {
             Text(
                 text = stringResource(R.string.to_register),
-                color = colorResource(R.color.light_gray)
+                color = colorResource(R.color.gray)
             )
         }
     }

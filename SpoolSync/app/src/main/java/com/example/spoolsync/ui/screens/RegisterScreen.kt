@@ -1,5 +1,6 @@
 package com.example.spoolsync.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -34,6 +36,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
+import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.AuthViewModel
 
 /**
@@ -61,12 +64,13 @@ fun RegisterScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.banner),
+            painter = painterResource(id = R.drawable.banner_light),
             contentDescription = null,
             tint = Color.Unspecified
         )
@@ -166,7 +170,7 @@ fun RegisterScreen(
                             },
                             onError = { error ->
                                 isLoading = false
-                                errorMessage = error ?: message5
+                                errorMessage = message5
                             }
                         )
                     }
@@ -177,8 +181,7 @@ fun RegisterScreen(
                 .height(50.dp),
             shape = RoundedCornerShape(25.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.light_gray),
-                contentColor = colorResource(R.color.dark_gray)
+                containerColor = SpoolSyncTheme.colors.lightGrayGray
             ),
             enabled = !isLoading
         ) {
@@ -189,7 +192,7 @@ fun RegisterScreen(
                     strokeWidth = 2.dp
                 )
             } else {
-                Text(stringResource(R.string.register))
+                Text(stringResource(R.string.register), color = colorResource(R.color.white))
             }
         }
 
@@ -199,7 +202,7 @@ fun RegisterScreen(
         ) {
             Text(
                 text = stringResource(R.string.to_login),
-                color = colorResource(R.color.light_gray)
+                color = colorResource(R.color.gray)
             )
         }
     }

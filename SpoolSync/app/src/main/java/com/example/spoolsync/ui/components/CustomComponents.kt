@@ -157,7 +157,7 @@ fun <T> FormWithIcon(
                                 onClick = {
                                     navController.navigate("filamentNfcUpdate/${id}")
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.buttonBackground),
+                                colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),
                                 modifier = Modifier
                                     .padding(end = 10.dp)
                             ) {
@@ -214,7 +214,7 @@ fun WeightInputField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(end = 12.dp)
-            .background(SpoolSyncTheme.colors.textBoxBackground, RoundedCornerShape(10.dp))
+            .background(SpoolSyncTheme.colors.lightGrayGray, RoundedCornerShape(10.dp))
     ) {
         TextField(
             value = inputWeight,
@@ -280,8 +280,8 @@ fun DropdownField(
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    focusedContainerColor = SpoolSyncTheme.colors.textBoxBackground,
-                    unfocusedContainerColor = SpoolSyncTheme.colors.textBoxBackground
+                    focusedContainerColor = SpoolSyncTheme.colors.lightGrayGray,
+                    unfocusedContainerColor = SpoolSyncTheme.colors.lightGrayGray
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -289,7 +289,7 @@ fun DropdownField(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
-                    .border(1.dp, SpoolSyncTheme.colors.textBoxBackground)
+                    .border(1.dp, SpoolSyncTheme.colors.lightGrayGray)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(
@@ -299,7 +299,7 @@ fun DropdownField(
                             expanded = false
                         },
                         modifier = Modifier
-                            .background(SpoolSyncTheme.colors.textBoxBackground)
+                            .background(SpoolSyncTheme.colors.lightGrayGray)
                             .padding(8.dp)
                     )
                 }
@@ -326,7 +326,7 @@ fun ColorPicker(
         modifier = Modifier
             .size(50.dp)
             .background(selectedColor, CircleShape)
-            .border(2.dp, SpoolSyncTheme.colors.filamentCircleBorder, CircleShape)
+            .border(2.dp, SpoolSyncTheme.colors.darkGrayGray, CircleShape)
             .clickable { showColorPicker = true }
     ) {
         if (showColorPicker) {
@@ -377,7 +377,7 @@ fun DatePicker(
             .fillMaxWidth()
             .height(52.dp)
             .padding(end = 12.dp)
-            .background(SpoolSyncTheme.colors.textBoxBackground, RoundedCornerShape(10.dp))
+            .background(SpoolSyncTheme.colors.lightGrayGray, RoundedCornerShape(10.dp))
     ){
         Text(
             text = selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
@@ -440,7 +440,7 @@ fun DecorativeCornerDividers(
     boxHeight: Dp = 60.dp,
     dividerLength: Dp = 20.dp,
     dividerThickness: Dp = 4.dp,
-    dividerColor: Color = colorResource(R.color.light_gray)
+    dividerColor: Color = SpoolSyncTheme.colors.lightGrayWhite
 ) {
     Box(
         modifier = modifier
@@ -514,14 +514,14 @@ fun DecorativeCornerDividers(
  * @param icon Ikona akcie.
  * @param label Text akcie.
  * @param onClick Funkcia, ktorá sa zavolá pri kliknutí na akciu.
- * @param color Farba kontentu akcie (predvolená je čierna).
+ * @param color Farba pozadia akcie.
  */
 @Composable
 fun AccountActionButton(
     icon: ImageVector,
     label: String,
     onClick: () -> Unit,
-    color: Color = colorResource(R.color.dark_gray)
+    color: Color = SpoolSyncTheme.colors.lightGrayGray
 ) {
     Button(
         onClick = onClick,
@@ -530,8 +530,8 @@ fun AccountActionButton(
             .height(50.dp),
         shape = RoundedCornerShape(25.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(R.color.light_gray),
-            contentColor = color
+            containerColor = color,
+            contentColor = colorResource(R.color.white)
         )
     ) {
         Icon(icon, contentDescription = null)
