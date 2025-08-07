@@ -51,7 +51,7 @@ fun FilamentsScreen(
     filamentViewModel: FilamentViewModel = viewModel()
 ) {
     var selectedCategory by remember { mutableStateOf("") }
-    val filamentStatuses = stringArrayResource(R.array.filament_status_options)
+    val filamentStatuses = listOf("Opened", "Closed", "Using")
 
     Scaffold(
         topBar = {
@@ -204,7 +204,7 @@ fun FilamentsScreen(
 @Composable
 fun CategoryChip(
     imageResource: Int,
-    filamentStatuses: Array<String>,
+    filamentStatuses: List<String>,
     selectedCategory: String,
     onCategorySelected: (String) -> Unit
 ) {
@@ -246,10 +246,10 @@ fun CategoryChip(
 
         Text(
             text = when (imageResource) {
-                R.drawable.ic_filament -> stringResource(R.string.all)
-                R.drawable.ic_box_opened -> filamentStatuses[0]
-                R.drawable.ic_box_closed -> filamentStatuses[1]
-                R.drawable.ic_printer -> filamentStatuses[2]
+                R.drawable.ic_filament -> stringArrayResource(R.array.filament_status_options)[0]
+                R.drawable.ic_box_opened -> stringArrayResource(R.array.filament_status_options)[1]
+                R.drawable.ic_box_closed -> stringArrayResource(R.array.filament_status_options)[2]
+                R.drawable.ic_printer -> stringArrayResource(R.array.filament_status_options)[3]
                 else -> ""
             },
             style = MaterialTheme.typography.bodyLarge,

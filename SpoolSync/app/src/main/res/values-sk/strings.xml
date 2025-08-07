@@ -38,6 +38,7 @@
     <string name="delete_filament">Odstrániť filament</string>
 
     <string-array name="filament_status_options">
+        <item>Všetko</item>
         <item>Otvorené</item>
         <item>Zatvorené</item>
         <item>Používa sa</item>
@@ -49,7 +50,6 @@
     <string name="settings">Nastavenia</string>
     <string name="add">Pridať</string>
     <string name="categories">Kategórie</string>
-    <string name="all">Všetko</string>
 
     <!-- Nfc strings -->
     <string name="nfc">NFC</string>
