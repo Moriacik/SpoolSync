@@ -3,8 +3,6 @@ package com.example.spoolsync.ui.viewModels
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
@@ -21,35 +19,20 @@ class OcrViewModel(
 ) : AndroidViewModel(application) {
 
     /**
-     * Rozpozná text z orezaného stredu obrázka načítaného z Uri.
-     * Orezáva stred obrázka na veľkosť 100x60 (alebo menej podľa veľkosti obrázka) a použije ML Kit na rozpoznanie textu.
+     * Rozpozná text z orezaného obrázka.
      *
-     * @param context Kontext na prístup k content resolveru.
-     * @param imageUri Uri obrázka, z ktorého sa má rozpoznať text.
-     * @return Rozpoznaný text alebo null, ak sa obrázok nepodarilo načítať.
+     * @param bitmap Bitmap obrázka, z ktorého sa má rozpoznať text.
+     * @return Rozpoznaný text alebo prázdny reťazec v prípade chyby.
      */
-    suspend fun recognizeTextFromCroppedImage(
-        context: Context,
-        imageUri: Uri
-    ): String? {
-        val inputStream = context.contentResolver.openInputStream(imageUri)
-        val originalBitmap = inputStream?.use { BitmapFactory.decodeStream(it) } ?: return null
-        val cropWidth = minOf(100, originalBitmap.width)
-        val cropHeight = minOf(60, originalBitmap.height)
-        val startX = (originalBitmap.width - cropWidth) / 2
-        val startY = (originalBitmap.height - cropHeight) / 2
-
-        val croppedBitmap = Bitmap.createBitmap(
-            originalBitmap,
-            startX,
-            startY,
-            cropWidth,
-            cropHeight
-        )
-
-        val image = InputImage.fromBitmap(croppedBitmap, 0)
+    suspend fun recognizeTextFromCroppedImage(bitmap: Bitmap): String {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        val result = recognizer.process(image).await()
-        return result.text
+        val inputImage = InputImage.fromBitmap(bitmap, 0)
+
+        return try {
+            val firebaseVisionText = recognizer.process(inputImage).await()
+            firebaseVisionText.text.trim()
+        } catch (exception: Exception) {
+            ""
+        }
     }
 }

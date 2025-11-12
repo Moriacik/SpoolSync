@@ -71,7 +71,7 @@ import com.example.spoolsync.ui.viewModels.FilamentViewModel
  *
  * @param navController Navigácia v aplikácii.
  * @param filamentViewModel ViewModel pre správu filamentov.
- * @param imageUri URI obrázka naskenovaného filamentu.
+ * @param selectedImage Bitmap vybraného obrázku filamentu.
  * @param filament Filament, ktorého hmotnosť sa aktualizuje.
  * @param scannedWeight Naskenovaná hmotnosť filamentu.
  */
@@ -80,25 +80,16 @@ import com.example.spoolsync.ui.viewModels.FilamentViewModel
 fun PrintScreen(
     navController: NavController,
     filamentViewModel: FilamentViewModel,
-    imageUri: String,
+    selectedImage: Bitmap?,
     filament: Filament? = null,
     scannedWeight: String
 ) {
     val context = LocalContext.current
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     var scannedWeightState by remember { mutableStateOf(scannedWeight) }
     val scannedRoundedWeight = scannedWeightState.toFloatOrNull()?.toInt() ?: 0
     val newWeight = filament?.weight?.minus(scannedRoundedWeight) ?: 0
     val error1 = stringResource(R.string.negative_weight)
-
-    LaunchedEffect(imageUri) {
-        try {
-            val inputStream = context.contentResolver.openInputStream(imageUri.toUri())
-            selectedImage = BitmapFactory.decodeStream(inputStream)
-        } catch (_: Exception) {
-        }
-    }
 
     Scaffold(
         topBar = {

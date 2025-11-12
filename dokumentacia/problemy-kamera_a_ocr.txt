@@ -1,0 +1,334 @@
+Komplexná história problémov a ich riešení - Kamera a OCR
+Úvod
+Cesta k funkčnému OCR systému bola dlhá a obsahovala viaceré vrstvy problémov. Začali sme s nefunkčnou kamerou a skončili s čistým, funkčným kódom. Pozrime si kompletnú evolúciu.  <hr></hr>
+1. PRVÝ PROBLÉM: Kamera "precnievala" - Nefunkčný náhľad
+Problematika
+Kamera v OcrScreen sa vôbec nezobrazovala. Preview bola čierna/prázdna a užívateľ nemohol vidieť, čo fotí.  
+Príčina
+Nedostatočné inicializačné logiky pre PreviewView
+Problém s scaleType a implementationMode nastaveniami
+Chýbala správna konfigurácia kamery viazania (binding)
+Riešenie
+Správna konfigurácia PreviewView:  val previewView = PreviewView(ctx).apply { implementationMode = PreviewView.ImplementationMode.COMPATIBLE scaleType = PreviewView.ScaleType.FILL_CENTER }  val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx) cameraProviderFuture.addListener({ val cameraProvider = cameraProviderFuture.get() val preview = Preview.Builder().build() .also { it.setSurfaceProvider(previewView.surfaceProvider) }  
+val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+cameraProvider.unbindAll()
+cameraProvider.bindToLifecycle(
+    ctx as LifecycleOwner, cameraSelector, preview, imageCapture
+)
+}, ContextCompat.getMainExecutor(ctx))  <hr></hr>
+2. DRUHÝ PROBLÉM: Rozlisenie a zarovnanie oblasti zaujmu
+Problematika
+Obrázok z kamery nemal dostatočné rozlíšenie na čitateľnosť textu
+Oblasť zaujmu (region of interest) nebola správne zarovnaná na stred
+Nezarovnaný výrez vedúci na zlú kvalitu OCR
+Príčina
+Nedostatočné rozlíšenie snímača
+Chybný výpočet pozície a veľkosti výrezu
+Riešenie
+Implementácia správneho výpočtu výrezu zo stredu obrázka:  val cropWidthRatio = 0.27f // 27% šírky val cropHeightRatio = 0.10f // 10% výšky  val cropWidth = (rotatedBitmap.width * cropWidthRatio).toInt() val cropHeight = (rotatedBitmap.height * cropHeightRatio).toInt() val startX = maxOf(0, (rotatedBitmap.width - cropWidth) / 2) // Centrovaný val startY = maxOf(0, (rotatedBitmap.height - cropHeight) / 2) // Centrovaný  val croppedBitmap = Bitmap.createBitmap( rotatedBitmap, startX, startY, cropWidth, cropHeight )  <hr></hr>
+3. TRETÍ PROBLÉM: Otočenie obrázka
+Problematika
+Obrázok z kamery bol otočený o 90 stupňov - nepreskupoval sa do očakávanej orientácie.  
+Príčina
+Kamera vraciav obrázky v landscape formáte, ale aplikácia očakávala portrait.  
+Riešenie
+Funkcia na rotáciu obrázka:  fun Bitmap.rotateRight90(): Bitmap { val matrix = android.graphics.Matrix() matrix.postRotate(90f) return android.graphics.Bitmap.createBitmap( this, 0, 0, width, height, matrix, true ) }  val rotatedBitmap = bitmap.rotateRight90()  <hr></hr>
+4. ŠTVRTÝ PROBLÉM: OCR vraciav prázdny string - Asynchronný problém (KĽÚČOVÝ)
+Problematika
+Najzávaživejší problém: OCR metóda vraciala prázdny string "" namiesto rozpoznaného textu "47.2".  
+Diagnostika - Logy odhalili časový nesúlad:
+D OCR result: '' ← Vraciav sa hneď (prázdne) D Firebase text blocks found: 1 ← Neskôr sa zistilo, že blok existuje D Block 0: '47.2' ← Neskôr bol nájdený text D Final OCR result: '47.2' ← Nakoniec správny výsledok  
+Príčina - RACE CONDITION (Súbeh vlákien)
+Funkcia bola synchronná, ale spracovanie bolo asynchronné:  // ❌ PROBLÉM - Synchronná funkcia s asynchronným callbackom fun recognizeTextFromCrappedImage(bitmap: Bitmap): String { var result = ""  
+recognizer.process(inputImage)
+    .addOnSuccessListener { firebaseVisionText ->
+        result = firebaseVisionText.text.trim()  // Nastaví sa NESKÔR
+        android.util.Log.d("OcrDebug", "Final OCR result: '$result'")
+    }
+    .addOnFailureListener { exception ->
+        android.util.Log.e("OcrDebug", "OCR failed", exception)
+    }
+
+return result  // Vrátí "" OKAMŽITE, skôr ako sa callback spustí!
+}  Sekvencia udalostí:  
+Volá sa recognizeTextFromCrappedImage()
+Registruje sa addOnSuccessListener callback
+Hneď sa vracia result = ""
+Neskôr (o niekoľko 100ms) sa spustí callback a nastaví správny text
+Ale volaný kód už má prázdny string!
+Riešenie - Coroutines s await()
+Vymenenie callback-based API na coroutine-based s await():  // ✅ RIEŠENIE - Suspend funkcia s await() suspend fun recognizeTextFromCrappedImage(bitmap: Bitmap): String { val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) val inputImage = InputImage.fromBitmap(bitmap, 0)  
+return try {
+    // await() čeká na dokončenie úlohy
+    val firebaseVisionText = recognizer.process(inputImage).await()
+    firebaseVisionText.text.trim()
+} catch (exception: Exception) {
+    ""
+}
+}  Ako funguje await():  
+Pozastaví coroutine (nevráti thread)
+Čeká kým sa Firebase task skončí
+Vrátí výsledok keď je hotov
+Automaticky spravuje chyby
+Volanie v OcrScreen:  coroutineScope.launch { val result = ocrViewModel.recognizeTextFromCrappedImage(croppedBitmap) // Teraz je result = "47.2", nie "" scannedText = result navController.navigate(...) }  <hr></hr>
+5. PIATY PROBLÉM: Debug kód v produkcii
+Problematika
+Kód obsahoval:  
+Ukládanie debug bitmap súborov na disk
+Viaceré Log.d() a Log.e() výpisy
+Nepoužívané importy
+Zbytočné logiky znižujúce výkon
+Príčina
+Debug kód z fázy riešenia problémov
+Nečistený po diagnóze
+Riešenie
+Čistka OcrScreen.kt:  // ❌ Odstránené: // - Ukládanie bitmap súborov // - Všetky Log.d() a Log.e() výpisy // - Nepoužívané premenné (previewWidth, previewHeight) // - Import BitmapFactory  // ✅ Zostalo: val croppedBitmap = Bitmap.createBitmap(...) val result = ocrViewModel.recognizeTextFromCrappedImage(croppedBitmap)  Čistka OcrViewModel.kt:  // ❌ Odstránené: // - android.util.Log.d() výpisy // - Zbytočné iterácie cez textové bloky // - Nepoužívané importy (Uri, BitmapFactory)  // ✅ Zostalo: suspend fun recognizeTextFromCrappedImage(bitmap: Bitmap): String { val recognizer = TextRecognition.getClient(...) val inputImage = InputImage.fromBitmap(bitmap, 0)  
+return try {
+    val firebaseVisionText = recognizer.process(inputImage).await()
+    firebaseVisionText.text.trim()
+} catch (exception: Exception) {
+    ""
+}
+}  <hr></hr>
+ČASOVÁ OSA RIEŠENIA
+Fáza
+Problém
+Status
+1
+Kamera "precnievala"
+✅ Opravené - Správna konfigurácia AndroidView
+2
+Otočenie obrázka
+✅ Opravené - Funkcia rotateRight90()
+3
+Zarovnanie výrezu
+✅ Opravené - Centrovaný výpočet pozície
+4
+OCR vracia ""
+✅ Opravené - Coroutines + await()
+5
+Debug kód
+✅ Vyčistené - Odebrané všetky Log výpisy
+<hr></hr>
+KONEČNÉ RIEŠENIE - Čisté kódy
+OcrViewModel.kt:  package com.example.spoolsync.ui.viewModels  import android.app.Application import android.content.Context import android.graphics.Bitmap import androidx.lifecycle.AndroidViewModel import com.google.mlkit.vision.common.InputImage import com.google.mlkit.vision.text.TextRecognition import com.google.mlkit.vision.text.latin.TextRecognizerOptions import kotlinx.coroutines.tasks.await  /**  
+ViewModel pre rozpoznávanie textu z obrázkov pomocou ML Kit OCR.  
+
+@param application Kontext aplikácie potrebný pre AndroidViewModel. */ class OcrViewModel( application: Application ) : AndroidViewModel(application) {  /**  
+Rozpozná text z orezaného obrázka.  
+
+@param context Kontext na prístup k resoursom.  
+@param bitmap Bitmap obrázka, z ktorého sa má rozpoznať text.  
+@return Rozpoznaný text alebo prázdny reťazec v prípade chyby. */ suspend fun recognizeTextFromCroppedImage(context: Context, bitmap: Bitmap): String { val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS) val inputImage = InputImage.fromBitmap(bitmap, 0)  return try { val firebaseVisionText = recognizer.process(inputImage).await() firebaseVisionText.text.trim() } catch (exception: Exception) { "" } } }  
+OcrScreen.kt:  package com.example.spoolsync.ui.screens  import android.graphics.Bitmap import android.graphics.BitmapFactory import androidx.camera.core.CameraSelector import androidx.camera.core.ImageCapture import androidx.camera.core.ImageCaptureException import androidx.camera.core.Preview import androidx.camera.lifecycle.ProcessCameraProvider import androidx.camera.view.PreviewView import androidx.compose.foundation.background import androidx.compose.foundation.border import androidx.compose.foundation.layout.* import androidx.compose.material3.* import androidx.compose.runtime.* import androidx.compose.ui.Alignment import androidx.compose.ui.Modifier import androidx.compose.ui.draw.clipToBounds import androidx.compose.ui.graphics.Color import androidx.compose.ui.layout.onSizeChanged import androidx.compose.ui.platform.LocalContext import androidx.compose.ui.res.colorResource import androidx.compose.ui.res.painterResource import androidx.compose.ui.res.stringResource import androidx.compose.ui.text.font.FontWeight import androidx.compose.ui.unit.dp import androidx.compose.ui.viewinterop.AndroidView import androidx.core.content.ContextCompat import androidx.lifecycle.LifecycleOwner import androidx.navigation.NavController import com.example.spoolsync.R import com.example.spoolsync.ui.components.DecorativeCornerDividers import com.example.spoolsync.ui.theme.SpoolSyncTheme import com.example.spoolsync.ui.viewModels.OcrViewModel import kotlinx.coroutines.launch import java.io.File import kotlin.collections.remove  @OptIn(ExperimentalMaterial3Api::class) @Composable fun OcrScreen( navController: NavController, ocrViewModel: OcrViewModel ) { val coroutineScope = rememberCoroutineScope() val context = LocalContext.current var scannedText by remember { mutableStateOf<String?>(null) } var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) } var imageCapture: ImageCapture? by remember { mutableStateOf(null) } var previewWidth by remember { mutableStateOf(0) } var previewHeight by remember { mutableStateOf(0) }  
+fun Bitmap.rotateRight90(): Bitmap {
+    val matrix = android.graphics.Matrix()
+    matrix.postRotate(90f)
+    return android.graphics.Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+}
+
+LaunchedEffect(Unit) {
+    val filamentId = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("filamentId")
+
+    val weight = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("scannedWeight")
+
+    if (filamentId != null && weight != null) {
+        navController.currentBackStackEntry?.savedStateHandle?.remove<String>("filamentId")
+        navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scannedWeight")
+        navController.navigate("print/$filamentId/$weight") {
+            popUpTo("filamentNfcRead") { inclusive = true }
+        }
+    }
+}
+
+Scaffold(
+    topBar = {
+        TopAppBar(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_printer),
+                        contentDescription = stringResource(R.string.print),
+                        Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(text = stringResource(R.string.print), fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    },
+    bottomBar = {
+        BottomAppBar(
+            containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray
+        ) {
+            NavigationBar(
+                containerColor = Color.Transparent
+            ) {
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("filaments") },
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_filament),
+                            contentDescription = stringResource(R.string.filaments),
+                            tint = colorResource(R.color.gray),
+                            modifier = Modifier.size(48.dp),
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent
+                    )
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("filamentNfcRead") },
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_info),
+                            contentDescription = stringResource(R.string.info),
+                            tint = colorResource(R.color.gray),
+                            modifier = Modifier.size(32.dp)
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent
+                    )
+                )
+                NavigationBarItem(
+                    selected = true,
+                    onClick = {  },
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_printer),
+                            contentDescription = stringResource(R.string.print),
+                            tint = SpoolSyncTheme.colors.blackWhite,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent
+                    )
+                )
+            }
+        }
+    }
+) { innerPadding ->
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(300.dp)
+                    .clipToBounds()
+                    .border(2.dp, SpoolSyncTheme.colors.lightGrayWhite)
+                    .onSizeChanged { size ->
+                        previewWidth = size.width
+                        previewHeight = size.height
+                    }
+            ) {
+                AndroidView(
+                    factory = { ctx ->
+                        val previewView = PreviewView(ctx).apply {
+                            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                            scaleType = PreviewView.ScaleType.FILL_CENTER
+                        }
+                        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                        cameraProviderFuture.addListener({
+                            val cameraProvider = cameraProviderFuture.get()
+                            val preview = Preview.Builder().build()
+                                .also { it.setSurfaceProvider(previewView.surfaceProvider) }
+                            imageCapture = ImageCapture.Builder().build()
+                            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                            cameraProvider.unbindAll()
+                            cameraProvider.bindToLifecycle(
+                                ctx as LifecycleOwner, cameraSelector, preview, imageCapture
+                            )
+                        }, ContextCompat.getMainExecutor(ctx))
+                        previewView
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+                Box(modifier = Modifier.size(100.dp, 60.dp).background(Color.Transparent).align(Alignment.Center)) {
+                    DecorativeCornerDividers()
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = {
+                val picturesDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES)
+                val file = File(picturesDir ?: context.cacheDir, "temp.jpg")
+                val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+                imageCapture?.takePicture(
+                    outputOptions,
+                    ContextCompat.getMainExecutor(context),
+                    object : ImageCapture.OnImageSavedCallback {
+                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                            val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                            val rotatedBitmap = bitmap.rotateRight90()
+
+                            val cropWidthRatio = 0.27f
+                            val cropHeightRatio = 0.10f
+
+                            val cropWidth = (rotatedBitmap.width * cropWidthRatio).toInt()
+                            val cropHeight = (rotatedBitmap.height * cropHeightRatio).toInt()
+                            val startX = maxOf(0, (rotatedBitmap.width - cropWidth) / 2)
+                            val startY = maxOf(0, (rotatedBitmap.height - cropHeight) / 2)
+
+                            capturedBitmap = rotatedBitmap
+                            coroutineScope.launch {
+                                val croppedBitmap = Bitmap.createBitmap(
+                                    rotatedBitmap,
+                                    startX,
+                                    startY,
+                                    cropWidth,
+                                    cropHeight
+                                )
+
+                                val result = ocrViewModel.recognizeTextFromCroppedImage(context, croppedBitmap)
+                                scannedText = result
+
+                                navController.currentBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("scannedWeight", result)
+                                navController.currentBackStackEntry
+                                    ?.savedStateHandle
+                                    ?.set("capturedBitmap", rotatedBitmap)
+
+                                navController.navigate("filamentNfcReadOcr") {
+                                    popUpTo("filamentNfcReadOcr") { inclusive = true }
+                                }
+                            }
+                        }
+                        override fun onError(exc: ImageCaptureException) {}
+                    }
+                )
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Capture")
+        }
+    }
+}
+}  <hr></hr>
+KĽÚČOVÉ POZNATKY
+Kamera - Vyžaduje správnu konfiguráciu PreviewView a ProcessCameraProvider
+Rozlíšenie - 3456x4608px je dostatočné, výrez 27% × 10% poskytuje dobrú čitateľnosť
+Otočenie - Vždy transformovať obrázky z kamery s Matrix.postRotate(90f)
+OCR + Async - Najdôležitejšie: Callback-based API treba konvertovať na coroutines s await()
+Kód - Vždy vyčistiť debug logiku po diagnóze
+Celá cesta od nefunkčnej kamery k fungujúcemu OCR systému bola lekciou v asynchronnom programovaní a správe vlákien v Androide!

@@ -1,5 +1,6 @@
 package com.example.spoolsync.navigation
 
+import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -25,6 +26,7 @@ import com.example.spoolsync.ui.viewModels.OcrViewModel
 import com.example.spoolsync.ui.viewModels.SettingsViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlin.text.get
 
 /**
  * Hlavná navigačná funkcia aplikácie SpoolSync.
@@ -150,20 +152,19 @@ fun SpoolSyncApp(startDestination: String) {
         }
 
         // Tlač filamentu
-        composable("print/{imageUri}/{filamentId}/{scannedWeight}",
+        composable("print/{filamentId}/{scannedWeight}",
             arguments = listOf(
-                navArgument("imageUri") { type = NavType.StringType },
                 navArgument("filamentId") { type = NavType.StringType },
                 navArgument("scannedWeight") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val imageUri = backStackEntry.arguments?.getString("imageUri") ?: ""
             val filamentId = backStackEntry.arguments?.getString("filamentId") ?: ""
             val scannedWeight = backStackEntry.arguments?.getString("scannedWeight") ?: ""
+            val capturedBitmap = backStackEntry.savedStateHandle.get<Bitmap>("capturedBitmap")
             PrintScreen(
                 navController,
                 filamentViewModel,
-                imageUri,
+                capturedBitmap,
                 filament = filamentViewModel.filaments.find { it.id == filamentId },
                 scannedWeight
             )
