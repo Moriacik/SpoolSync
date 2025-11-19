@@ -11,6 +11,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,7 +35,6 @@ import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.OcrViewModel
 import kotlinx.coroutines.launch
 import java.io.File
-import kotlin.collections.remove
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,6 +136,21 @@ fun OcrScreen(
                                 contentDescription = stringResource(R.string.print),
                                 tint = SpoolSyncTheme.colors.blackWhite,
                                 modifier = Modifier.size(48.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
+                    )
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { navController.navigate("sessions") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_sessions),
+                                contentDescription = stringResource(R.string.sessions),
+                                tint = colorResource(R.color.gray),
+                                modifier = Modifier.size(32.dp)
                             )
                         },
                         colors = NavigationBarItemDefaults.colors(
@@ -247,9 +262,13 @@ fun OcrScreen(
                         }
                     )
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(25.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray)
             ) {
-                Text("Capture")
+                Text(stringResource(R.string.capture), color = colorResource(R.color.white))
             }
         }
     }

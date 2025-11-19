@@ -102,4 +102,17 @@
     <string name="manage_permissions">Spravovať povolenia</string>
     <string name="account_settings">Nastavenia účtu</string>
     <string name="about">O aplikácii</string>
+
+    <!-- Ocr strings -->
+    <string name="capture">Odfotiť</string>
+
+    <!-- Session strings -->
+    <string name="sessions">Skupiny</string>
+    <string name="create_session">Vytvoriť skupinu</string>
+    <string name="create">Vytvoriť</string>
+    <string name="join_session">Pripojiť sa do skupiny</string>
+    <string name="join">Pripojiť sa</string>
+    <string name="access_code">Prístupový Kód</string>
+    <string name="session_name">Názov skupiny</string>
+    <string name="open_sessions">Otvoriť skupinu</string>
 </resources>

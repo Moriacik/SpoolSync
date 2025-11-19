@@ -209,6 +209,21 @@ fun FilamentNfcScreen(
                         },
                         colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
                     )
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { navController.navigate("sessions") },
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_sessions),
+                                contentDescription = stringResource(R.string.sessions),
+                                tint = colorResource(R.color.gray),
+                                modifier = Modifier.size(32.dp)
+                            )
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            indicatorColor = Color.Transparent
+                        )
+                    )
                 }
             }
         }

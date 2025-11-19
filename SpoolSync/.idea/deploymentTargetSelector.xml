@@ -3,11 +3,11 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="app">
-        <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2025-11-12T10:31:45.652794700Z">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-11-14T10:40:06.224830900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\marti\.android\avd\Pixel_8_Pro_API_35_test_.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=ZY227HGMBC" />
             </handle>
           </Target>
         </DropdownSelection>

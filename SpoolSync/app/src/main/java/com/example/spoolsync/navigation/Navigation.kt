@@ -20,9 +20,11 @@ import com.example.spoolsync.ui.screens.FilamentNfcScreen
 import com.example.spoolsync.ui.screens.FilamentNfcScreenMode
 import com.example.spoolsync.ui.screens.OcrScreen
 import com.example.spoolsync.ui.screens.PrintScreen
+import com.example.spoolsync.ui.screens.SessionsScreen
 import com.example.spoolsync.ui.screens.SettingsScreen
 import com.example.spoolsync.ui.viewModels.NfcViewModel
 import com.example.spoolsync.ui.viewModels.OcrViewModel
+import com.example.spoolsync.ui.viewModels.SessionsViewModel
 import com.example.spoolsync.ui.viewModels.SettingsViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -40,6 +42,7 @@ fun SpoolSyncApp(startDestination: String) {
     val filamentViewModel: FilamentViewModel = viewModel()
     val ocrViewModel: OcrViewModel = viewModel()
     val nfcViewModel: NfcViewModel = viewModel()
+    val sessionsViewModel: SessionsViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -169,5 +172,36 @@ fun SpoolSyncApp(startDestination: String) {
                 scannedWeight
             )
         }
+
+        composable("sessions") {
+            SessionsScreen(
+                navController = navController,
+                sessionsViewModel = sessionsViewModel
+            )
+        }
+
+        /*
+
+        composable("sessionJoin") {
+            SessionJoinScreen(
+                navController = navController,
+                sessionViewModel = sessionsViewModel
+            )
+        }
+
+        composable(
+            route = "sessionDetail/{sessionId}",
+            arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: return@composable
+            SessionDetailScreen(
+                navController = navController,
+                sessionViewModel = sessionsViewModel,
+                filamentViewModel = filamentViewModel,
+                sessionId = sessionId
+            )
+        }
+
+         */
     }
 }

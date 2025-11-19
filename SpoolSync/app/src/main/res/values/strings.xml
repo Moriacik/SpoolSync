@@ -102,4 +102,17 @@
     <string name="manage_permissions">Manage Permissions</string>
     <string name="account_settings">Account Settings</string>
     <string name="about">About</string>
+
+    <!-- Ocr strings -->
+    <string name="capture">Capture</string>
+
+    <!-- Sessions strings -->
+    <string name="sessions">Sessions</string>
+    <string name="create_session">Create session</string>
+    <string name="create">Create</string>
+    <string name="join_session">Join session</string>
+    <string name="join">Join</string>
+    <string name="access_code">Access code</string>
+    <string name="session_name">Session name</string>
+    <string name="open_sessions">Open sessions</string>
 </resources>

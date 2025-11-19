@@ -29,6 +29,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -59,6 +61,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
 
 /**
@@ -566,4 +569,105 @@ fun SettingsActionButton(
         )
         trailing?.invoke()
     }
+}
+enum class SessionDialogMode {
+    CREATE,
+    JOIN
+}
+
+@Composable
+fun SessionDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    dialogMode: SessionDialogMode = SessionDialogMode.CREATE,
+    isLoading: Boolean = false,
+    errorMessage: String? = null
+) {
+    var sessionInput by remember { mutableStateOf("") }
+
+    val titleResId = when (dialogMode) {
+        SessionDialogMode.CREATE -> R.string.create_session
+        SessionDialogMode.JOIN -> R.string.join_session
+    }
+
+    val labelResId = when (dialogMode) {
+        SessionDialogMode.CREATE -> R.string.session_name
+        SessionDialogMode.JOIN -> R.string.access_code
+    }
+
+    val buttonLabelResId = when (dialogMode) {
+        SessionDialogMode.CREATE -> R.string.create
+        SessionDialogMode.JOIN -> R.string.join_session
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(titleResId),
+                color = colorResource(R.color.white),
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = sessionInput,
+                    onValueChange = { sessionInput = it },
+                    label = { Text(
+                        stringResource(labelResId),
+                        color = colorResource(R.color.gray)
+                    ) },
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = !isLoading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.light_gray),
+                        unfocusedBorderColor = colorResource(R.color.light_gray),
+                        cursorColor = colorResource(R.color.light_gray),
+                        focusedTextColor = colorResource(R.color.white),
+                        unfocusedTextColor = colorResource(R.color.white)
+                    )
+                )
+
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage,
+                        color = colorResource(R.color.red),
+                        fontSize = androidx.compose.material3.MaterialTheme.typography.bodySmall.fontSize
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (sessionInput.isNotEmpty()) {
+                        onConfirm(sessionInput)
+                    }
+                },
+                enabled = !isLoading && sessionInput.isNotEmpty(),
+                colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray)
+            ) {
+                if (isLoading) {
+                    androidx.compose.material3.CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = colorResource(R.color.white),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(stringResource(buttonLabelResId), color = colorResource(R.color.white))
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, enabled = !isLoading) {
+                Text(stringResource(R.string.cancel), color = colorResource(R.color.gray))
+            }
+        },
+        containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray,
+        textContentColor = colorResource(R.color.white)
+    )
 }
