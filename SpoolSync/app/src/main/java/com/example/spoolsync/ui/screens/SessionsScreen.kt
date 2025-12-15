@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.spoolsync.R
 import com.example.spoolsync.data.model.Session
+import com.example.spoolsync.ui.components.BottomNavigationBar
+import com.example.spoolsync.ui.components.NavigationItem
 import com.example.spoolsync.ui.components.SessionDialog
 import com.example.spoolsync.ui.components.SessionDialogMode
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
@@ -94,85 +96,28 @@ fun SessionsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             painter = painterResource(R.drawable.ic_sessions),
                             contentDescription = stringResource(R.string.sessions),
                             Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Text(text = stringResource(R.string.sessions), fontWeight = FontWeight.Bold)
+                        Text(
+                            text = stringResource(R.string.sessions),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             )
         },
         bottomBar = {
-            BottomAppBar(
-                containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray
-            ) {
-                NavigationBar(
-                    containerColor = Color.Transparent
-                ) {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("filaments") },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_filament),
-                                contentDescription = stringResource(R.string.filaments),
-                                tint = colorResource(R.color.gray),
-                                modifier = Modifier.size(48.dp),
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("filamentNfcRead") },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_info),
-                                contentDescription = stringResource(R.string.info),
-                                tint = colorResource(R.color.gray),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("ocr") },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_printer),
-                                contentDescription = stringResource(R.string.print),
-                                tint = colorResource(R.color.gray),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
-                    )
-                    NavigationBarItem(
-                        selected = true,
-                        onClick = { },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_sessions),
-                                contentDescription = stringResource(R.string.sessions),
-                                tint = SpoolSyncTheme.colors.blackWhite,
-                                modifier = Modifier.size(48.dp)
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
-                    )
-                }
-            }
+            BottomNavigationBar(
+                navController = navController,
+                selectedItem = NavigationItem.SESSIONS
+            )
         }
     ) { innerPadding ->
         Column(

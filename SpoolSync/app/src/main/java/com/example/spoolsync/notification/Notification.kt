@@ -45,10 +45,11 @@ object Notification {
      *
      * @param context Kontext aplikácie.
      * @param filamentId Identifikátor filamentu.
-     * @param expirationDate Dátum exspirácie filamentu.
+     * @param expirationDate Dátum exspirácie filamentu vo formáte YYYY-MM-DD.
      */
-    fun scheduleNotification(context: Context, filamentId: String, expirationDate: LocalDate) {
-        val delay = expirationDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis()
+    fun scheduleNotification(context: Context, filamentId: String, expirationDate: String) {
+        val parsedDate = LocalDate.parse(expirationDate)
+        val delay = parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis()
 
         val workData = Data.Builder()
             .putString("filamentId", filamentId)

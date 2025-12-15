@@ -35,6 +35,9 @@ import androidx.navigation.NavController
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
 import com.example.spoolsync.R
 import com.example.spoolsync.data.model.Filament
+import com.example.spoolsync.ui.components.BottomNavigationBar
+import com.example.spoolsync.ui.components.FilamentList
+import com.example.spoolsync.ui.components.NavigationItem
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
 
 /**
@@ -91,70 +94,10 @@ fun FilamentsScreen(
             )
         },
         bottomBar = {
-            BottomAppBar(
-                containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray
-            ) {
-                NavigationBar(
-                    containerColor = Color.Transparent
-                ) {
-                    NavigationBarItem(
-                        selected = true,
-                        onClick = { },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_filament),
-                                contentDescription = stringResource(R.string.filaments),
-                                tint = SpoolSyncTheme.colors.blackWhite,
-                                modifier = Modifier.size(60.dp),
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("filamentNfcRead") },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_info),
-                                contentDescription = stringResource(R.string.info),
-                                tint = colorResource(R.color.gray),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("ocr") },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_printer),
-                                contentDescription = stringResource(R.string.print),
-                                tint = colorResource(R.color.gray),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("sessions") },
-                        icon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_sessions),
-                                contentDescription = stringResource(R.string.sessions),
-                                tint = colorResource(R.color.gray),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent
-                        )
-                    )
-                }
-            }
+            BottomNavigationBar(
+                navController = navController,
+                selectedItem = NavigationItem.FILAMENTS
+            )
         }
     ) { innerPadding ->
         Column(
@@ -171,20 +114,16 @@ fun FilamentsScreen(
                     )
                 }
             }
-            LazyColumn(
-                modifier = Modifier.weight(1f)
-            ) {
-                val filteredFilaments = if (selectedCategory.isEmpty()) {
-                    filamentViewModel.filaments
-                } else {
-                    filamentViewModel.filaments.filter { it.status == selectedCategory }
-                }
-
-                items(filteredFilaments) { filament ->
-                    FilamentItem(filament, navController)
-                    HorizontalDivider(color = SpoolSyncTheme.colors.lightGrayDarkGray)
-                }
+            val filteredFilaments = if (selectedCategory.isEmpty()) {
+                filamentViewModel.filaments
+            } else {
+                filamentViewModel.filaments.filter { it.status == selectedCategory }
             }
+            FilamentList(
+                filaments = filteredFilaments,
+                navController = navController,
+                modifier = Modifier.weight(1f)
+            )
 
             Text(
                 text = stringResource(R.string.categories),

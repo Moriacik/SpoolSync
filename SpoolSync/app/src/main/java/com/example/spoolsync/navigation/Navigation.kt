@@ -20,8 +20,10 @@ import com.example.spoolsync.ui.screens.FilamentNfcScreen
 import com.example.spoolsync.ui.screens.FilamentNfcScreenMode
 import com.example.spoolsync.ui.screens.OcrScreen
 import com.example.spoolsync.ui.screens.PrintScreen
+import com.example.spoolsync.ui.screens.SessionDetailScreen
 import com.example.spoolsync.ui.screens.SessionsScreen
 import com.example.spoolsync.ui.screens.SettingsScreen
+import com.example.spoolsync.ui.screens.StatisticsScreen
 import com.example.spoolsync.ui.viewModels.NfcViewModel
 import com.example.spoolsync.ui.viewModels.OcrViewModel
 import com.example.spoolsync.ui.viewModels.SessionsViewModel
@@ -180,28 +182,16 @@ fun SpoolSyncApp(startDestination: String) {
             )
         }
 
-        /*
-
-        composable("sessionJoin") {
-            SessionJoinScreen(
-                navController = navController,
-                sessionViewModel = sessionsViewModel
-            )
-        }
-
-        composable(
-            route = "sessionDetail/{sessionId}",
-            arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: return@composable
+        composable("sessionDetail/{sessionId}") { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
             SessionDetailScreen(
-                navController = navController,
-                sessionViewModel = sessionsViewModel,
-                filamentViewModel = filamentViewModel,
-                sessionId = sessionId
+                navController,
+                sessionId
             )
         }
 
-         */
+        composable("statistics") {
+            StatisticsScreen(navController = navController)
+        }
     }
 }

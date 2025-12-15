@@ -3,6 +3,7 @@ package com.example.spoolsync.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -19,6 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -29,6 +33,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -46,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,7 +69,10 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import com.example.spoolsync.data.model.Filament
+import com.example.spoolsync.ui.screens.FilamentItem
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
 
 /**
@@ -614,10 +625,12 @@ fun SessionDialog(
                 OutlinedTextField(
                     value = sessionInput,
                     onValueChange = { sessionInput = it },
-                    label = { Text(
-                        stringResource(labelResId),
-                        color = colorResource(R.color.gray)
-                    ) },
+                    label = {
+                        Text(
+                            stringResource(labelResId),
+                            color = colorResource(R.color.gray)
+                        )
+                    },
                     shape = RoundedCornerShape(12.dp),
                     enabled = !isLoading,
                     modifier = Modifier
@@ -664,6 +677,216 @@ fun SessionDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss, enabled = !isLoading) {
+                Text(stringResource(R.string.cancel), color = colorResource(R.color.gray))
+            }
+        },
+        containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray,
+        textContentColor = colorResource(R.color.white)
+    )
+}
+
+
+@Composable
+fun FilamentList(
+    filaments: List<Filament>,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier) {
+        items(filaments) { filament ->
+            FilamentItem(filament, navController)
+            HorizontalDivider(color = SpoolSyncTheme.colors.lightGrayDarkGray)
+        }
+    }
+}
+
+
+@Composable
+fun FilamentItem(filament: Filament, navController: NavController) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable { navController.navigate("filamentView/${filament.id}") },
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .border(2.dp, SpoolSyncTheme.colors.darkGrayGray, CircleShape)
+                .background(Color(filament.color.toArgb()), shape = CircleShape)
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 20.dp)
+        ) {
+            Text(
+                text = filament.type,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = filament.brand,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = filament.weight.toString(),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = filament.status,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+enum class NavigationItem {
+    FILAMENTS,
+    INFO,
+    PRINT,
+    SESSIONS
+}
+
+@Composable
+fun BottomNavigationBar(
+    navController: NavController,
+    selectedItem: NavigationItem,
+    modifier: Modifier = Modifier
+) {
+    BottomAppBar(
+        containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray,
+        modifier = modifier
+    ) {
+        NavigationBar(
+            containerColor = Color.Transparent
+        ) {
+            NavigationBarItem(
+                selected = selectedItem == NavigationItem.FILAMENTS,
+                onClick = { navController.navigate("filaments") },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_filament),
+                        contentDescription = stringResource(R.string.filaments),
+                        tint = if (selectedItem == NavigationItem.FILAMENTS)
+                            SpoolSyncTheme.colors.blackWhite else colorResource(R.color.gray),
+                        modifier = Modifier.width(48.dp)
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent
+                )
+            )
+            NavigationBarItem(
+                selected = selectedItem == NavigationItem.INFO,
+                onClick = { navController.navigate("filamentNfcRead") },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_info),
+                        contentDescription = stringResource(R.string.info),
+                        tint = if (selectedItem == NavigationItem.INFO)
+                            SpoolSyncTheme.colors.blackWhite else colorResource(R.color.gray),
+                        modifier = Modifier.width(32.dp)
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent
+                )
+            )
+            NavigationBarItem(
+                selected = selectedItem == NavigationItem.PRINT,
+                onClick = { navController.navigate("ocr") },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_printer),
+                        contentDescription = stringResource(R.string.print),
+                        tint = if (selectedItem == NavigationItem.PRINT)
+                            SpoolSyncTheme.colors.blackWhite else colorResource(R.color.gray),
+                        modifier = Modifier.width(32.dp)
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent
+                )
+            )
+            NavigationBarItem(
+                selected = selectedItem == NavigationItem.SESSIONS,
+                onClick = { navController.navigate("sessions") },
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_sessions),
+                        contentDescription = stringResource(R.string.sessions),
+                        tint = if (selectedItem == NavigationItem.SESSIONS)
+                            SpoolSyncTheme.colors.blackWhite else colorResource(R.color.gray),
+                        modifier = Modifier.width(48.dp)
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun ShareFilamentDialog(
+    filament: Filament,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    sessions: Map<String, String> = emptyMap()
+) {
+    var selectedSessionId by remember { mutableStateOf("") }
+    val sessionNames = sessions.values.toList()
+    val sessionIds = sessions.keys.toList()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.share_filament, filament.type),
+                color = colorResource(R.color.white),
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(R.string.select_session_to_move),
+                    color = colorResource(R.color.gray),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                DropdownField(
+                    options = sessionNames,
+                    selectedOption = sessions[selectedSessionId] ?: "",
+                    onOptionSelected = { selectedName ->
+                        selectedSessionId = sessionIds[sessionNames.indexOf(selectedName)]
+                    }
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(selectedSessionId) },
+                enabled = selectedSessionId.isNotEmpty(),
+                colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray)
+            ) {
+                Text(stringResource(R.string.share), color = colorResource(R.color.white))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.cancel), color = colorResource(R.color.gray))
             }
         },

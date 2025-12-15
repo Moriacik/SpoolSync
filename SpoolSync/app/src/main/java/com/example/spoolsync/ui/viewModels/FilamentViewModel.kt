@@ -1,29 +1,23 @@
 package com.example.spoolsync.ui.viewModels
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.spoolsync.data.model.Filament
-import com.example.spoolsync.notification.Notification
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
-import java.util.UUID
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
-/**
- * ViewModel pre správu filamentov používateľa.
- * Zodpovedá za načítanie, pridávanie, aktualizáciu a mazanie filamentov v databáze Firestore.
- * Umožňuje tiež aktualizovať hmotnosť a NFC stav filamentu, načítať filament podľa ID a spravovať notifikácie.
- *
- * @param application Kontext aplikácie potrebný pre AndroidViewModel.
- */
 class FilamentViewModel(
     application: Application
 ) : AndroidViewModel(application) {
@@ -32,19 +26,11 @@ class FilamentViewModel(
     val currentFilament = mutableStateOf<Filament?>(null)
     val filaments = mutableStateListOf<Filament>()
 
-    /**
-     * Inicializuje ViewModel a načíta filamenty používateľa.
-     * Ak nie je používateľ prihlásený, nastaví userId na prázdny reťazec.
-     */
     fun setUserId(newUserId: String) {
         userId = newUserId
         loadFilaments()
     }
 
-    /**
-     * Načíta všetky filamenty používateľa z Firestore a aktualizuje stav filaments.
-     * Používa addSnapshotListener pre sledovanie zmien v reálnom čase.
-     */
     fun loadFilaments() {
         db.collection("users").document(userId)
             .addSnapshotListener { snapshot, error ->
@@ -56,62 +42,33 @@ class FilamentViewModel(
                 val userFilaments = snapshot?.get("filaments") as? List<Map<String, Any>>
                 userFilaments?.forEach { data ->
                     try {
-                        filaments.add(
-                            Filament(
-                                id = data["id"] as? String ?: "",
-                                type = data["type"] as? String ?: "",
-                                brand = data["brand"] as? String ?: "",
-                                weight = (data["weight"] as? Number)?.toInt() ?: 0,
-                                status = data["status"] as? String ?: "",
-                                color = Color(android.graphics.Color.parseColor(data["color"] as? String ?: "#000000")),
-                                expirationDate = (data["expirationDate"] as? String).let { LocalDate.parse(it) },
-                                activeNfc = (data["activeNfc"] as? Boolean) == false,
-                                note = data["note"] as? String ?: ""
-                            )
-                        )
-                    }
-                    catch (_: Exception) {
+                        filaments.add(Filament.fromMap(data))
+                    } catch (_: Exception) {
                     }
                 }
             }
     }
 
-    /**
-     * Uloží nový filament do Firestore a naplánuje notifikáciu pre jeho expiráciu.
-     * @param filament Objekt Filament, ktorý sa má uložiť.
-     */
-    fun saveNewFilament(
-        filament: Filament
-    ) {
+    fun saveNewFilament(filament: Filament) {
         val newFilament = mapOf(
-           "id" to  UUID.randomUUID().toString(),
+            "id" to java.util.UUID.randomUUID().toString(),
             "type" to filament.type,
             "brand" to filament.brand,
             "weight" to filament.weight,
             "status" to filament.status,
             "color" to String.format("#%08X", filament.color.toArgb()),
-            "expirationDate" to filament.expirationDate?.toString(),
+            "expirationDate" to filament.expirationDate,
             "activeNfc" to filament.activeNfc,
-            "note" to filament.note
+            "note" to filament.note,
+            "ownerId" to userId,
+            "originalWeight" to filament.weight
         )
 
         db.collection("users").document(userId)
             .update("filaments", FieldValue.arrayUnion(newFilament))
-
-        Notification.scheduleNotification(
-            getApplication<Application>().applicationContext,
-            filament.id,
-            filament.expirationDate
-        )
     }
 
-    /**
-     * Uloží existujúci filament do Firestore, aktualizuje jeho údaje a prepíše existujúce hodnoty.
-     * @param filament Objekt Filament, ktorý sa má uložiť.
-     */
-    fun saveExistfilament(
-        filament: Filament
-    ) {
+    fun saveExistfilament(filament: Filament) {
         db.collection("users").document(userId)
             .get()
             .addOnSuccessListener { document ->
@@ -124,10 +81,12 @@ class FilamentViewModel(
                             "brand" to filament.brand,
                             "weight" to filament.weight,
                             "status" to filament.status,
-                            "color" to "#${filament.color.value.toULong().toString(16).substring(0, 8)}",
-                            "expirationDate" to filament.expirationDate.toString(),
-                            "activeNfc" to !filament.activeNfc,
-                            "note" to filament.note
+                            "color" to String.format("#%08X", filament.color.toArgb()),
+                            "expirationDate" to filament.expirationDate,
+                            "activeNfc" to filament.activeNfc,
+                            "note" to filament.note,
+                            "ownerId" to filament.ownerId,
+                            "originalWeight" to filament.originalWeight
                         )
                     } else {
                         existingFilament
@@ -139,11 +98,6 @@ class FilamentViewModel(
             }
     }
 
-    /**
-     * Načíta filament podľa jeho ID a aktualizuje currentFilament.
-     * @param filamentId ID filamentu, ktorý sa má načítať.
-     * @param callback Funkcia, ktorá sa zavolá s výsledkom načítania.
-     */
     fun loadFilamentById(
         filamentId: String,
         callback: (Boolean) -> Unit
@@ -155,17 +109,7 @@ class FilamentViewModel(
                     val userFilaments = document.get("filaments") as? List<Map<String, Any>>
                     val matchingFilament = userFilaments?.find { it["id"] == filamentId }
                     if (matchingFilament != null) {
-                        currentFilament.value = Filament(
-                            id = matchingFilament["id"] as? String ?: "",
-                            type = matchingFilament["type"] as? String ?: "",
-                            brand = matchingFilament["brand"] as? String ?: "",
-                            weight = (matchingFilament["weight"] as? Number)?.toInt() ?: 0,
-                            status = matchingFilament["status"] as? String ?: "",
-                            color = Color(android.graphics.Color.parseColor(matchingFilament["color"] as? String ?: "#000000")),
-                            expirationDate = (matchingFilament["expirationDate"] as? String).let { LocalDate.parse(it) },
-                            activeNfc = (matchingFilament["activeNfc"] as? Boolean) == false,
-                            note = matchingFilament["note"] as? String ?: ""
-                        )
+                        currentFilament.value = Filament.fromMap(matchingFilament)
                         callback(true)
                     } else {
                         callback(false)
@@ -179,11 +123,6 @@ class FilamentViewModel(
             }
     }
 
-    /**
-     * Aktualizuje stav NFC pre daný filament podľa jeho ID.
-     * @param filamentId ID filamentu, ktorého NFC stav sa má aktualizovať.
-     * @param status Nový stav NFC.
-     */
     fun updateFilamentNfcStatus(
         filamentId: String,
         status: Boolean
@@ -207,11 +146,6 @@ class FilamentViewModel(
             }
     }
 
-    /**
-     * Aktualizuje hmotnosť filamentu podľa jeho ID.
-     * @param filamentId ID filamentu, ktorého hmotnosť sa má aktualizovať.
-     * @param newWeight Nová hmotnosť filamentu.
-     */
     fun updateFilamentWeight(
         filamentId: String,
         newWeight: Int
@@ -235,10 +169,6 @@ class FilamentViewModel(
             }
     }
 
-    /**
-     * Odstráni filament podľa jeho ID z databázy.
-     * @param filamentId ID filamentu, ktorý sa má odstrániť.
-     */
     fun deleteFilament(
         filamentId: String
     ) {
@@ -254,5 +184,80 @@ class FilamentViewModel(
                         loadFilaments()
                     }
             }
+    }
+
+    private val _sessions = MutableStateFlow<Map<String, String>>(emptyMap())
+    val sessions: StateFlow<Map<String, String>> = _sessions
+
+    data class UiState(val error: String? = null)
+    private val _uiState = MutableLiveData(UiState())
+
+    init {
+        loadSessions()
+    }
+
+    private fun loadSessions() {
+        viewModelScope.launch {
+            try {
+                val querySnapshot = db.collection("sessions").get().await()
+                val sessionMap = mutableMapOf<String, String>()
+                querySnapshot.documents.forEach { doc ->
+                    val sessionId = doc.id
+                    val sessionName = doc.getString("name") ?: sessionId
+                    sessionMap[sessionId] = sessionName
+                }
+                _sessions.value = sessionMap
+            } catch (e: Exception) {
+                _sessions.value = emptyMap()
+            }
+        }
+    }
+
+    fun moveFilamentToSession(
+        filamentId: String,
+        sessionId: String,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val userDoc = db.collection("users").document(userId).get().await()
+                val userFilaments =
+                    userDoc.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+                val filamentToMove = userFilaments.find { it["id"] == filamentId }
+
+                if (filamentToMove != null) {
+                    db.collection("users").document(userId)
+                        .update("filaments", FieldValue.arrayRemove(filamentToMove))
+                        .await()
+
+                    val sessionFilament = mutableMapOf<String, Any>()
+                    sessionFilament["id"] = (filamentToMove["id"] as? String) ?: ""
+                    sessionFilament["type"] = (filamentToMove["type"] as? String) ?: ""
+                    sessionFilament["brand"] = (filamentToMove["brand"] as? String) ?: ""
+                    sessionFilament["weight"] =
+                        ((filamentToMove["weight"] as? Number)?.toInt()) ?: 0
+                    sessionFilament["status"] = (filamentToMove["status"] as? String) ?: ""
+                    sessionFilament["color"] = (filamentToMove["color"] as? String) ?: "#FFFFFFFF"
+                    sessionFilament["expirationDate"] =
+                        (filamentToMove["expirationDate"] as? String) ?: ""
+                    sessionFilament["activeNfc"] =
+                        (filamentToMove["activeNfc"] as? Boolean) ?: false
+                    sessionFilament["note"] = (filamentToMove["note"] as? String) ?: ""
+                    sessionFilament["ownerId"] = userId
+                    sessionFilament["originalWeight"] =
+                        ((filamentToMove["originalWeight"] as? Number)?.toInt())
+                            ?: ((filamentToMove["weight"] as? Number)?.toInt()) ?: 0
+
+                    db.collection("sessions").document(sessionId)
+                        .update("filaments", FieldValue.arrayUnion(sessionFilament))
+                        .await()
+
+                    loadFilaments()
+                    onSuccess()
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value?.copy(error = e.message)
+            }
+        }
     }
 }

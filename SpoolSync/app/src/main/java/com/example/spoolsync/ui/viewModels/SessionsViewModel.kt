@@ -2,6 +2,7 @@ package com.example.spoolsync.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.spoolsync.data.model.Filament
 import com.example.spoolsync.data.model.Session
 import com.example.spoolsync.data.repository.SessionRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -19,6 +20,9 @@ class SessionsViewModel : ViewModel() {
 
     private val _sessions = MutableStateFlow<List<Session>>(emptyList())
     val sessions: StateFlow<List<Session>> = _sessions
+
+    private val _sessionFilaments = MutableStateFlow<List<Filament>>(emptyList())
+    val sessionFilaments: StateFlow<List<Filament>> = _sessionFilaments
 
     private val _currentSession = MutableStateFlow<Session?>(null)
     val currentSession: StateFlow<Session?> = _currentSession
@@ -82,12 +86,25 @@ class SessionsViewModel : ViewModel() {
             val result = sessionRepository.getSession(sessionId)
             result.onSuccess { session ->
                 _currentSession.value = session
+                loadSessionFilaments(sessionId)
                 _errorMessage.value = null
             }
             result.onFailure { exception ->
                 _errorMessage.value = exception.message
             }
             _isLoading.value = false
+        }
+    }
+
+    private fun loadSessionFilaments(sessionId: String) {
+        viewModelScope.launch {
+            val result = sessionRepository.getSessionFilaments(sessionId)
+            result.onSuccess { filaments ->
+                _sessionFilaments.value = filaments
+            }
+            result.onFailure { exception ->
+                _errorMessage.value = exception.message
+            }
         }
     }
 
@@ -104,18 +121,6 @@ class SessionsViewModel : ViewModel() {
                 _errorMessage.value = exception.message
             }
             _isLoading.value = false
-        }
-    }
-
-    fun addFilamentToSession(sessionId: String, filamentId: String, ownerId: String, originalWeight: Int) {
-        viewModelScope.launch {
-            val result = sessionRepository.addFilamentToSession(sessionId, filamentId, ownerId, originalWeight)
-            result.onSuccess {
-                loadSession(sessionId)
-            }
-            result.onFailure { exception ->
-                _errorMessage.value = exception.message
-            }
         }
     }
 

@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // QR Sessions - for web authentication
+    match /qrSessions/{sessionId} {
+      // Anyone can create new QR sessions
+      allow create: if request.auth == null || request.auth != null;
+      
+      // Anyone can read to verify session exists
+      allow read: if request.auth == null || request.auth != null;
+      
+      // Only authenticated users can update
+      // and only to confirm with their own ID
+      allow update: if request.auth != null && 
+                       request.data.confirmed == true &&
+                       request.data.confirmedBy == request.auth.uid &&
+                       resource.data.confirmed != true;
+      
+      // Prevent deletion
+      allow delete: if false;
+    }
+    
+    // User statistics/profile
+    match /users/{userId} {
+      // Users can read their own data
+      allow read: if request.auth != null && 
+                     request.auth.uid == userId;
+      
+      // Users can write their own data
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId;
+    }
+    
+    // Statistics collection for users
+    match /users/{userId}/statistics/{statId} {
+      // Users can read their own statistics
+      allow read: if request.auth != null && 
+                     request.auth.uid == userId;
+      
+      // Users can write their own statistics
+      allow write: if request.auth != null && 
+                      request.auth.uid == userId;
+    }
+  }
+}

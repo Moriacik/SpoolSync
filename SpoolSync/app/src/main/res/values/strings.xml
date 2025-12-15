@@ -36,6 +36,7 @@
     <string name="select_color">Select color</string>
     <string name="select_date">Select date</string>
     <string name="delete_filament">Delete filament</string>
+    <string name="share">Share</string>
 
     <string-array name="filament_status_options">
         <item>All</item>
@@ -115,4 +116,13 @@
     <string name="access_code">Access code</string>
     <string name="session_name">Session name</string>
     <string name="open_sessions">Open sessions</string>
+
+    <!-- Custom components strings -->
+    <string name="share_filament">Share filament: %s</string>
+    <string name="select_session_to_move">Select session, to which you want to move filament</string>
+
+    <!-- Statistics strings -->
+    <string name="export_statistics">Export statistics</string>
+    <string name="scan_qr_code">Scan QR code</string>
+    <string name="scan_qr_instruction">Point the camera at a QR code on the website</string>
 </resources>

@@ -36,6 +36,7 @@
     <string name="select_color">Vyberte farbu</string>
     <string name="select_date">Vyberte dátum</string>
     <string name="delete_filament">Odstrániť filament</string>
+    <string name="share">Zdielať</string>
 
     <string-array name="filament_status_options">
         <item>Všetko</item>
@@ -115,4 +116,13 @@
     <string name="access_code">Prístupový Kód</string>
     <string name="session_name">Názov skupiny</string>
     <string name="open_sessions">Otvoriť skupinu</string>
+
+    <!-- Custom components strings -->
+    <string name="share_filament">Zdieľať filament: %s</string>
+    <string name="select_session_to_move">Vyber session, do ktorej chceš presunúť filament</string>
+
+    <!-- Statistics strings -->
+    <string name="export_statistics">Exportovať štatistiky</string>
+    <string name="scan_qr_code">Skenovať QR kód</string>
+    <string name="scan_qr_instruction">Nasmeruj kameru na QR kód na webe</string>
 </resources>

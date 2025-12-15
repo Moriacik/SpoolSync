@@ -1,7 +1,9 @@
 package com.example.spoolsync.data.repository
 
+import android.util.Log
+import androidx.compose.ui.graphics.Color
+import com.example.spoolsync.data.model.Filament
 import com.example.spoolsync.data.model.Session
-import com.example.spoolsync.data.model.SessionFilament
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -29,6 +31,11 @@ class SessionRepository(
             )
 
             firestore.collection("sessions").document(sessionId).set(session).await()
+
+            firestore.collection("sessions").document(sessionId).update(
+                "filaments", emptyList<Map<String, Any>>()
+            ).await()
+
             firestore.collection("users").document(userId).collection("sessions").document(sessionId).set(mapOf("joinedAt" to Date().time)).await()
 
             Result.success(session)
@@ -103,29 +110,24 @@ class SessionRepository(
         }
     }
 
-    suspend fun addFilamentToSession(sessionId: String, filamentId: String, ownerId: String, originalWeight: Int): Result<Unit> {
+    suspend fun getSessionFilaments(sessionId: String): Result<List<Filament>> {
         return try {
-            val sessionFilament = SessionFilament(
-                filamentId = filamentId,
-                ownerId = ownerId,
-                originalWeight = originalWeight,
-                currentWeight = originalWeight,
-                addedAt = Date().time
-            )
-
-            firestore.collection("sessions")
+            val sessionSnapshot = firestore.collection("sessions")
                 .document(sessionId)
-                .collection("filaments")
-                .document(filamentId)
-                .set(sessionFilament)
+                .get()
                 .await()
 
-            firestore.collection("sessions")
-                .document(sessionId)
-                .update("filaments", com.google.firebase.firestore.FieldValue.arrayUnion(filamentId))
-                .await()
+            val filamentsList = sessionSnapshot.get("filaments") as? List<Map<String, Any>> ?: emptyList()
 
-            Result.success(Unit)
+            val filaments = filamentsList.mapNotNull { map ->
+                try {
+                    Filament.fromMap(map)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            Result.success(filaments)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -133,17 +135,20 @@ class SessionRepository(
 
     suspend fun removeFilamentFromSession(sessionId: String, filamentId: String): Result<Unit> {
         return try {
-            firestore.collection("sessions")
+            val sessionSnapshot = firestore.collection("sessions")
                 .document(sessionId)
-                .collection("filaments")
-                .document(filamentId)
-                .delete()
+                .get()
                 .await()
 
-            firestore.collection("sessions")
-                .document(sessionId)
-                .update("filaments", com.google.firebase.firestore.FieldValue.arrayRemove(filamentId))
-                .await()
+            val filamentsList = sessionSnapshot.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+            val filamentToRemove = filamentsList.find { it["id"] == filamentId }
+
+            if (filamentToRemove != null) {
+                firestore.collection("sessions")
+                    .document(sessionId)
+                    .update("filaments", com.google.firebase.firestore.FieldValue.arrayRemove(filamentToRemove))
+                    .await()
+            }
 
             Result.success(Unit)
         } catch (e: Exception) {
@@ -165,25 +170,16 @@ class SessionRepository(
             } else {
                 val newOwner = if (session.ownerId == userId) updatedParticipants.first() else session.ownerId
 
+                val filamentsList = sessionSnapshot.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+                val updatedFilaments = filamentsList.filter { (it["ownerId"] as? String) != userId }
+
                 firestore.collection("sessions").document(sessionId).update(
                     mapOf(
                         "participants" to updatedParticipants,
-                        "ownerId" to newOwner
+                        "ownerId" to newOwner,
+                        "filaments" to updatedFilaments
                     )
                 ).await()
-
-                val filamentSnapshot = firestore.collection("sessions")
-                    .document(sessionId)
-                    .collection("filaments")
-                    .get()
-                    .await()
-
-                for (document in filamentSnapshot.documents) {
-                    val sessionFilament = document.toObject(SessionFilament::class.java)
-                    if (sessionFilament?.ownerId == userId) {
-                        removeFilamentFromSession(sessionId, document.id)
-                    }
-                }
             }
 
             firestore.collection("users").document(userId).collection("sessions").document(sessionId).delete().await()
@@ -196,11 +192,23 @@ class SessionRepository(
 
     suspend fun updateFilamentWeightInSession(sessionId: String, filamentId: String, newWeight: Int): Result<Unit> {
         return try {
+            val sessionSnapshot = firestore.collection("sessions")
+                .document(sessionId)
+                .get()
+                .await()
+
+            val filamentsList = sessionSnapshot.get("filaments") as? MutableList<Map<String, Any>> ?: mutableListOf()
+            val updatedFilaments = filamentsList.map { filament ->
+                if (filament["id"] == filamentId) {
+                    filament.toMutableMap().apply { this["weight"] = newWeight }
+                } else {
+                    filament
+                }
+            }
+
             firestore.collection("sessions")
                 .document(sessionId)
-                .collection("filaments")
-                .document(filamentId)
-                .update("currentWeight", newWeight)
+                .update("filaments", updatedFilaments)
                 .await()
 
             Result.success(Unit)

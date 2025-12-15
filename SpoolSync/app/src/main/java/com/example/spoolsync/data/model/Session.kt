@@ -1,6 +1,6 @@
 package com.example.spoolsync.data.model
 
-import java.util.Date
+import java.io.Serializable
 
 data class Session(
     val id: String = "",
@@ -8,7 +8,7 @@ data class Session(
     val ownerId: String = "",
     val accessCode: String = "",
     val participants: List<String> = emptyList(),
-    val filaments: List<String> = emptyList(),
-    val createdAt: Long = Date().time,
-    val updatedAt: Long = Date().time
-)
+    val filaments: List<Map<String, Any>> = emptyList(),
+    val createdAt: Long = 0,
+    val updatedAt: Long = 0
+) : Serializable
