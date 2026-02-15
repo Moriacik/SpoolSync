@@ -1,11 +1,14 @@
 package com.example.spoolsync.ui.viewModels
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.apply
 import kotlin.collections.remove
@@ -186,5 +189,149 @@ class AuthViewModel(
                 callback(false, authTask.exception?.localizedMessage ?: "Re-authentication failed")
             }
         }
+    }
+
+    /**
+     * Prihlásenie cez Google
+     * @param account Google Sign-In účet
+     * @param callback Výsledok prihlásenia (success, error)
+     */
+    fun signInWithGoogle(account: GoogleSignInAccount, callback: (Boolean, String?) -> Unit) {
+        Log.d("GoogleSignIn", "1. Starting Google Sign-In with account: ${account.email}")
+        try {
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            Log.d("GoogleSignIn", "2. Got Google credential")
+
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    Log.d("GoogleSignIn", "3. signInWithCredential completed")
+                    if (task.isSuccessful) {
+                        Log.d("GoogleSignIn", "4. Firebase Auth successful")
+                        val user = auth.currentUser
+                        Log.d("GoogleSignIn", "5. Current user: ${user?.uid}")
+                        if (user != null) {
+                            Log.d("GoogleSignIn", "6. User not null, saving profile...")
+                            // Počkaj na uloženie profilu pred callbackom
+                            saveOrUpdateUserProfileWithCallback(
+                                uid = user.uid,
+                                email = user.email ?: "",
+                                displayName = user.displayName ?: "",
+                                photoUrl = user.photoUrl?.toString() ?: ""
+                            ) {
+                                Log.d("GoogleSignIn", "7. Profile saved, calling callback(true)")
+                                saveUserToLocalStorage(user.uid)
+                                callback(true, null)
+                            }
+                        } else {
+                            Log.e("GoogleSignIn", "ERROR: User is null after auth success")
+                            callback(false, "User is null")
+                        }
+                    } else {
+                        Log.e("GoogleSignIn", "ERROR: Firebase auth failed - ${task.exception?.message}")
+                        callback(false, task.exception?.message)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("GoogleSignIn", "ERROR: signInWithCredential failed - ${exception.message}")
+                    callback(false, exception.message)
+                }
+        } catch (e: Exception) {
+            Log.e("GoogleSignIn", "ERROR: Exception in signInWithGoogle - ${e.message}", e)
+            callback(false, e.message)
+        }
+    }
+
+    /**
+     * Uloženie alebo aktualizácia profilu v Firestore s callbackom
+     */
+    private fun saveOrUpdateUserProfileWithCallback(
+        uid: String,
+        email: String,
+        displayName: String,
+        photoUrl: String,
+        onComplete: () -> Unit
+    ) {
+        Log.d("GoogleSignIn", "A. Starting saveOrUpdateUserProfileWithCallback for uid: $uid")
+        val userDoc = db.collection("users").document(uid)
+
+        userDoc.get().addOnCompleteListener { task ->
+            Log.d("GoogleSignIn", "B. Firestore get() completed")
+            if (task.isSuccessful) {
+                Log.d("GoogleSignIn", "C. Firestore get() successful")
+                if (!task.result.exists()) {
+                    Log.d("GoogleSignIn", "D. User doc doesn't exist, creating new...")
+                    val userData = hashMapOf(
+                        "uid" to uid,
+                        "email" to email,
+                        "displayName" to displayName,
+                        "photoUrl" to photoUrl,
+                        "createdAt" to System.currentTimeMillis(),
+                        "lastLoginAt" to System.currentTimeMillis(),
+                        "authProvider" to "google",
+                        "sessions" to arrayListOf<String>(),
+                        "filaments" to arrayListOf<String>()
+                    )
+                    userDoc.set(userData).addOnCompleteListener { setTask ->
+                        Log.d("GoogleSignIn", "E. Firestore set() completed")
+                        if (setTask.isSuccessful) {
+                            Log.d("GoogleSignIn", "F. Firestore set() successful, calling onComplete()")
+                            onComplete()
+                        } else {
+                            Log.e("GoogleSignIn", "ERROR: Firestore set() failed - ${setTask.exception?.message}")
+                            onComplete()
+                        }
+                    }.addOnFailureListener { exception ->
+                        Log.e("GoogleSignIn", "ERROR: Firestore set() failure - ${exception.message}")
+                        onComplete()
+                    }
+                } else {
+                    Log.d("GoogleSignIn", "G. User doc exists, updating...")
+                    userDoc.update(
+                        mapOf(
+                            "lastLoginAt" to System.currentTimeMillis(),
+                            "displayName" to displayName,
+                            "photoUrl" to photoUrl
+                        )
+                    ).addOnCompleteListener { updateTask ->
+                        Log.d("GoogleSignIn", "H. Firestore update() completed")
+                        if (updateTask.isSuccessful) {
+                            Log.d("GoogleSignIn", "I. Firestore update() successful, calling onComplete()")
+                            onComplete()
+                        } else {
+                            Log.e("GoogleSignIn", "ERROR: Firestore update() failed - ${updateTask.exception?.message}")
+                            onComplete()
+                        }
+                    }.addOnFailureListener { exception ->
+                        Log.e("GoogleSignIn", "ERROR: Firestore update() failure - ${exception.message}")
+                        onComplete()
+                    }
+                }
+            } else {
+                Log.e("GoogleSignIn", "ERROR: Firestore get() failed - ${task.exception?.message}")
+                onComplete()
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("GoogleSignIn", "ERROR: Firestore get() failure - ${exception.message}")
+            onComplete()
+        }
+    }
+
+    /**
+     * Uloženie UID do lokálneho úložiska
+     */
+    private fun saveUserToLocalStorage(uid: String) {
+        val sharedPref = getApplication<Application>().getSharedPreferences("user_prefs", 0)
+        sharedPref.edit().apply {
+            putString("user_uid", uid)
+            putLong("login_timestamp", System.currentTimeMillis())
+            apply()
+        }
+    }
+
+    /**
+     * Kontrola či je user prihlásený
+     */
+    fun checkAuthStatus(): Boolean {
+        return auth.currentUser != null
     }
 }

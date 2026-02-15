@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -27,10 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.spoolsync.R
 import com.example.spoolsync.ui.components.BottomNavigationBar
+import com.example.spoolsync.ui.components.CameraFrameOverlay
 import com.example.spoolsync.ui.components.DecorativeCornerDividers
 import com.example.spoolsync.ui.components.NavigationItem
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
@@ -46,16 +46,26 @@ fun OcrScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    var scannedText by remember { mutableStateOf<String?>(null) }
-    var capturedBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
-    var previewWidth by remember { mutableStateOf(0) }
-    var previewHeight by remember { mutableStateOf(0) }
+    var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
+
+    // Cleanup camera when leaving screen
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                cameraProvider?.unbindAll()
+                cameraProvider = null
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     fun Bitmap.rotateRight90(): Bitmap {
         val matrix = android.graphics.Matrix()
         matrix.postRotate(90f)
-        return android.graphics.Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+        return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
     }
 
     LaunchedEffect(Unit) {
@@ -106,20 +116,11 @@ fun OcrScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(300.dp)
-                        .clipToBounds()
-                        .border(2.dp, SpoolSyncTheme.colors.lightGrayWhite)
-                        .onSizeChanged { size ->
-                            previewWidth = size.width
-                            previewHeight = size.height
-                        }
-                ) {
+            CameraFrameOverlay(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp),
+                content = {
                     AndroidView(
                         factory = { ctx ->
                             val previewView = PreviewView(ctx).apply {
@@ -128,25 +129,23 @@ fun OcrScreen(
                             }
                             val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
                             cameraProviderFuture.addListener({
-                                val cameraProvider = cameraProviderFuture.get()
+                                val provider = cameraProviderFuture.get()
+                                cameraProvider = provider
                                 val preview = Preview.Builder().build()
                                     .also { it.setSurfaceProvider(previewView.surfaceProvider) }
                                 imageCapture = ImageCapture.Builder().build()
                                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-                                cameraProvider.unbindAll()
-                                cameraProvider.bindToLifecycle(
-                                    ctx as LifecycleOwner, cameraSelector, preview, imageCapture
+                                provider.unbindAll()
+                                provider.bindToLifecycle(
+                                    lifecycleOwner, cameraSelector, preview, imageCapture
                                 )
                             }, ContextCompat.getMainExecutor(ctx))
                             previewView
                         },
                         modifier = Modifier.fillMaxSize()
                     )
-                    Box(modifier = Modifier.size(100.dp, 60.dp).background(Color.Transparent).align(Alignment.Center)) {
-                        DecorativeCornerDividers()
-                    }
                 }
-            }
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -171,7 +170,6 @@ fun OcrScreen(
                                 val startX = maxOf(0, (rotatedBitmap.width - cropWidth) / 2)
                                 val startY = maxOf(0, (rotatedBitmap.height - cropHeight) / 2)
 
-                                capturedBitmap = rotatedBitmap
                                 coroutineScope.launch {
                                     val croppedBitmap = Bitmap.createBitmap(
                                         rotatedBitmap,
@@ -182,11 +180,13 @@ fun OcrScreen(
                                     )
 
                                     val result = ocrViewModel.recognizeTextFromCroppedImage(croppedBitmap)
-                                    scannedText = result
+
+                                    // Extract only numbers from OCR result (remove text like "g", "gramov", etc.)
+                                    val extractedNumber = result.filter { it.isDigit() }.takeIf { it.isNotEmpty() } ?: "0"
 
                                     navController.currentBackStackEntry
                                         ?.savedStateHandle
-                                        ?.set("scannedWeight", result)
+                                        ?.set("scannedWeight", extractedNumber)
                                     navController.currentBackStackEntry
                                         ?.savedStateHandle
                                         ?.set("capturedBitmap", rotatedBitmap)

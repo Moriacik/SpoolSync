@@ -14,6 +14,8 @@ firebaseCommonKtx = "21.0.0"
 firebaseAuthKtx = "23.2.0"
 firebaseFirestoreKtx = "25.1.3"
 googleMlKitTextRecognition = "16.0.1"
+googleMlKitBarcodeScanning = "17.3.0"
+googleServicesAuth = "20.7.0"
 navigationRuntimeKtx = "2.8.9"
 navigationCompose = "2.8.9"
 media3CommonKtx = "1.6.0"
@@ -53,6 +55,8 @@ firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-k
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 google-mlkit-textrecognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "googleMlKitTextRecognition" }
+google-mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "googleMlKitBarcodeScanning" }
+google-play-services-auth = {  group = "com.google.android.gms", name = "play-services-auth", version = "googleServicesAuth" }
 godaddy-android-colorpicker = { group = "com.godaddy.android.colorpicker", name = "compose-color-picker", version.ref = "colorPicker" }
 godaddy-android-colorpicker-android = { group = "com.godaddy.android.colorpicker", name = "compose-color-picker-android", version.ref = "colorPicker" }
 androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidWork" }

@@ -1,4 +1,3 @@
-rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
@@ -12,11 +11,13 @@ service cloud.firestore {
       // Anyone can read to verify session exists
       allow read: if true;
       
-      // Only authenticated users (Android) can update
-      // to confirm with their own ID
+      // Authenticated users (Android) can update to confirm
+      // Must send: confirmed=true, confirmedBy=userId, confirmedAt=timestamp
       allow update: if request.auth != null && 
-                       request.data.confirmed == true &&
-                       request.data.confirmedBy == request.auth.uid;
+                       'confirmed' in request.resource.data &&
+                       request.resource.data.confirmed == true &&
+                       'confirmedBy' in request.resource.data &&
+                       request.resource.data.confirmedBy == request.auth.uid;
       
       // Prevent deletion
       allow delete: if false;
@@ -57,3 +58,4 @@ service cloud.firestore {
     }
   }
 }
+

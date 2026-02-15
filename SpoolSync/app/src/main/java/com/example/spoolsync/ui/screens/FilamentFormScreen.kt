@@ -33,6 +33,7 @@ import com.example.spoolsync.ui.components.NavigationItem
 import com.example.spoolsync.ui.components.ShareFilamentDialog
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
 import com.example.spoolsync.ui.viewModels.FilamentViewModel
+import com.example.spoolsync.ui.viewModels.SessionsViewModel
 import java.time.LocalDate
 
 /**
@@ -48,11 +49,35 @@ fun FilamentFormScreen(
     navController: NavController,
     mode: FilamentFormMode = VIEW,
     initialFilament: Filament? = null,
-    filamentViewModel: FilamentViewModel
+    filamentViewModel: FilamentViewModel,
+    sessionId: String? = null,
+    sessionsViewModel: SessionsViewModel? = null,
+    filamentId: String? = null
 ) {
     val sessionsState by filamentViewModel.sessions.collectAsState()
-    var filament by remember { mutableStateOf(initialFilament ?: Filament("", "", "", 0, "", "#FFFFFF", LocalDate.now().toString(), false, "")) }
-    val originalFilament = remember { initialFilament ?: Filament("", "", "", 0, "", "#FFFFFF", LocalDate.now().toString(), false, "") }
+    val sessionFilaments by (sessionsViewModel?.sessionFilaments?.collectAsState() ?: remember { mutableStateOf(emptyList()) })
+
+    // Initialize filament from initialFilament or from sessionFilaments if available
+    var filament by remember(initialFilament, sessionFilaments) {
+        val fil = when {
+            // If we have a session context and filamentId, find from session filaments
+            !sessionId.isNullOrEmpty() && !filamentId.isNullOrEmpty() && sessionFilaments.isNotEmpty() -> {
+                sessionFilaments.find { it.id == filamentId } ?: initialFilament
+            }
+            // Otherwise use initialFilament
+            else -> initialFilament
+        } ?: Filament("", "", "", 0, "", "#FFFFFF", LocalDate.now().toString(), false, "")
+        mutableStateOf(fil)
+    }
+
+    val originalFilament = remember(initialFilament, sessionFilaments) {
+        when {
+            !sessionId.isNullOrEmpty() && !filamentId.isNullOrEmpty() && sessionFilaments.isNotEmpty() -> {
+                sessionFilaments.find { it.id == filamentId } ?: initialFilament
+            }
+            else -> initialFilament
+        } ?: Filament("", "", "", 0, "", "#FFFFFF", LocalDate.now().toString(), false, "")
+    }
     var isEditing by remember { mutableStateOf(mode == EDIT || mode == ADD) }
     var showShareDialog by remember { mutableStateOf(false) }
 
@@ -84,7 +109,9 @@ fun FilamentFormScreen(
                     mode = mode,
                     navController = navController,
                     filamentViewModel = filamentViewModel,
-                    onEditingDone = { isEditing = false }
+                    onEditingDone = { isEditing = false },
+                    sessionId = sessionId,
+                    sessionsViewModel = sessionsViewModel
                 )
             } else {
                 ViewMode(
@@ -189,7 +216,9 @@ private fun EditMode(
     mode: FilamentFormMode,
     navController: NavController,
     filamentViewModel: FilamentViewModel,
-    onEditingDone: () -> Unit
+    onEditingDone: () -> Unit,
+    sessionId: String? = null,
+    sessionsViewModel: SessionsViewModel? = null
 ) {
     Column(
         modifier = Modifier
@@ -219,7 +248,9 @@ private fun EditMode(
             mode = mode,
             navController = navController,
             filamentViewModel = filamentViewModel,
-            onEditingDone = onEditingDone
+            onEditingDone = onEditingDone,
+            sessionId = sessionId,
+            sessionsViewModel = sessionsViewModel
         )
     }
 }
@@ -304,7 +335,9 @@ private fun EditActionButtons(
     mode: FilamentFormMode,
     navController: NavController,
     filamentViewModel: FilamentViewModel,
-    onEditingDone: () -> Unit
+    onEditingDone: () -> Unit,
+    sessionId: String? = null,
+    sessionsViewModel: SessionsViewModel? = null
 ) {
     Row(
         modifier = Modifier
@@ -318,7 +351,12 @@ private fun EditActionButtons(
                 if (mode == ADD) {
                     filamentViewModel.saveNewFilament(filament)
                 } else {
-                    filamentViewModel.saveExistfilament(filament)
+                    // If this form edits a filament that belongs to a session, use SessionsViewModel to update
+                    if (sessionId != null && sessionsViewModel != null) {
+                        sessionsViewModel.updateSessionFilament(sessionId, filament)
+                    } else {
+                        filamentViewModel.saveExistfilament(filament)
+                    }
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),

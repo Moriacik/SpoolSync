@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -74,14 +73,6 @@ fun FilamentsScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { /* Notification action */ })
-                    {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = stringResource(R.string.notifications)
-                        )
-                    }
                     IconButton(
                         onClick = { navController.navigate("settings") })
                     {

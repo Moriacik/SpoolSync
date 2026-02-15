@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.*
 
 data class QRData(
     val sessionId: String,
@@ -33,10 +33,11 @@ class StatisticsViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
+                _errorMessage.value = null
 
                 // Overenie, že token nie je expirovaný
                 if (System.currentTimeMillis() > qrData.expiresAt) {
-                    _errorMessage.value = "QR kód už vypršal"
+                    _errorMessage.value = "QR kód už vypršal. Prosím, vygenerujte nový."
                     _isLoading.value = false
                     return@launch
                 }
@@ -59,16 +60,53 @@ class StatisticsViewModel : ViewModel() {
                         )
                     )
                     .addOnSuccessListener {
-                        _successMessage.value = "Štatistiky boli exportované"
                         _isLoading.value = false
                     }
                     .addOnFailureListener { exception ->
-                        _errorMessage.value = exception.message ?: "Chyba pri potvrdení"
+                        _errorMessage.value = exception.message ?: "Chyba pri potvrdení QR kódu"
                         _isLoading.value = false
                     }
 
             } catch (e: Exception) {
                 _errorMessage.value = e.message ?: "Neznáma chyba"
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun confirmQRSession(sessionId: String, requestToken: String) {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                _errorMessage.value = null
+
+                val userId = auth.currentUser?.uid
+                if (userId == null) {
+                    _errorMessage.value = "Používateľ nie je prihlásený"
+                    _isLoading.value = false
+                    return@launch
+                }
+
+                // Potvrdenie v Firestore - nastavenie confirmed=true a confirmedBy=userId
+                firestore.collection("qrSessions")
+                    .document(sessionId)
+                    .update(
+                        mapOf(
+                            "confirmed" to true,
+                            "confirmedBy" to userId,
+                            "confirmedAt" to FieldValue.serverTimestamp()
+                        )
+                    )
+                    .addOnSuccessListener {
+                        _isLoading.value = false
+                    }
+                    .addOnFailureListener { exception ->
+                        _errorMessage.value = "❌ ${exception.message ?: "Chyba pri potvrdení QR kódu"}"
+                        _isLoading.value = false
+                    }
+
+            } catch (e: Exception) {
+                _errorMessage.value = "❌ ${e.message ?: "Neznáma chyba"}"
                 _isLoading.value = false
             }
         }

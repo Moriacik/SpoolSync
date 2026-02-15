@@ -195,7 +195,12 @@ fun SessionItem(
             }
 
             Text(
-                text = if (session.ownerId == FirebaseAuth.getInstance().currentUser?.uid) "[owner]" else "[member]",
+                text = "[" + stringResource(
+                    if (session.ownerId == FirebaseAuth.getInstance().currentUser?.uid)
+                        R.string.owner
+                    else
+                        R.string.member
+                ) + "]",
                 style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp)

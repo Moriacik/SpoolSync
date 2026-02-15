@@ -17,6 +17,7 @@
     <string name="error5">Registrácia zlyhala.</string>
     <string name="to_register">Nemáte účet? Zaregistrujte sa.</string>
     <string name="to_login">Späť na prihlásenie.</string>
+    <string name="sign_in_with_google">Prihlásiť sa pomocou Google</string>
 
     <!-- Filament Form strings -->
     <string name="edit">Upraviť</string>
@@ -116,6 +117,13 @@
     <string name="access_code">Prístupový Kód</string>
     <string name="session_name">Názov skupiny</string>
     <string name="open_sessions">Otvoriť skupinu</string>
+    <string name="leave_session">Opustiť skupinu</string>
+    <string name="participants">Účastníci</string>
+    <string name="owner">Majiteľ</string>
+    <string name="member">Člen</string>
+    <string name="no_participants">Žiadni účastníci</string>
+    <string name="remove">Odstrániť</string>
+    <string name="save">Uložiť</string>
 
     <!-- Custom components strings -->
     <string name="share_filament">Zdieľať filament: %s</string>

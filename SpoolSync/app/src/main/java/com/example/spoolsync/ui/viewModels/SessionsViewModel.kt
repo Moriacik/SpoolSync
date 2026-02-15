@@ -144,4 +144,60 @@ class SessionsViewModel : ViewModel() {
             }
         }
     }
+
+    // New: update entire filament object in a session
+    fun updateSessionFilament(sessionId: String, filament: Filament) {
+        viewModelScope.launch {
+            val result = sessionRepository.updateFilamentInSession(sessionId, filament)
+            result.onSuccess {
+                // reload session filaments to reflect changes
+                loadSession(sessionId)
+                _errorMessage.value = null
+            }
+            result.onFailure { exception ->
+                _errorMessage.value = exception.message
+            }
+        }
+    }
+
+    fun loadSessionFilament(sessionId: String, filamentId: String, onResult: (Filament?) -> Unit) {
+        viewModelScope.launch {
+            val result = sessionRepository.getSessionFilament(sessionId, filamentId)
+            result.onSuccess { filament ->
+                onResult(filament)
+            }
+            result.onFailure { exception ->
+                _errorMessage.value = exception.message
+                onResult(null)
+            }
+        }
+    }
+
+    fun updateSessionName(sessionId: String, newName: String) {
+        viewModelScope.launch {
+            val result = sessionRepository.updateSessionName(sessionId, newName)
+            result.onSuccess {
+                // Reload session to reflect changes
+                loadSession(sessionId)
+                _errorMessage.value = null
+            }
+            result.onFailure { exception ->
+                _errorMessage.value = exception.message
+            }
+        }
+    }
+
+    fun removeParticipantFromSession(sessionId: String, participantId: String) {
+        viewModelScope.launch {
+            val result = sessionRepository.removeParticipantFromSession(sessionId, participantId)
+            result.onSuccess {
+                // Reload session to reflect changes
+                loadSession(sessionId)
+                _errorMessage.value = null
+            }
+            result.onFailure { exception ->
+                _errorMessage.value = exception.message
+            }
+        }
+    }
 }

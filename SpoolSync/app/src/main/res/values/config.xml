@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google Sign-In Configuration -->
+    <string name="google_web_client_id">725419336343-d0te5osajslp966jks8dd4m0mo0ipqp2.apps.googleusercontent.com</string>
+</resources>
+

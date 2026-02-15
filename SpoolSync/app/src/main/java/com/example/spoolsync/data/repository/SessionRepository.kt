@@ -1,7 +1,5 @@
 package com.example.spoolsync.data.repository
 
-import android.util.Log
-import androidx.compose.ui.graphics.Color
 import com.example.spoolsync.data.model.Filament
 import com.example.spoolsync.data.model.Session
 import com.google.firebase.auth.FirebaseAuth
@@ -26,8 +24,8 @@ class SessionRepository(
                 ownerId = userId,
                 accessCode = accessCode,
                 participants = listOf(userId),
-                createdAt = Date().time,
-                updatedAt = Date().time
+                sessionCreatedAt = Date().time,
+                lastModifiedAt = Date().time
             )
 
             firestore.collection("sessions").document(sessionId).set(session).await()
@@ -133,6 +131,25 @@ class SessionRepository(
         }
     }
 
+    suspend fun getSessionFilament(sessionId: String, filamentId: String): Result<Filament> {
+        return try {
+            val sessionSnapshot = firestore.collection("sessions")
+                .document(sessionId)
+                .get()
+                .await()
+
+            val filamentsList = sessionSnapshot.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+
+            val filamentMap = filamentsList.find { (it["id"] as? String) == filamentId }
+                ?: return Result.failure(Exception("Filament not found in session"))
+
+            val filament = Filament.fromMap(filamentMap)
+            Result.success(filament)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun removeFilamentFromSession(sessionId: String, filamentId: String): Result<Unit> {
         return try {
             val sessionSnapshot = firestore.collection("sessions")
@@ -177,7 +194,8 @@ class SessionRepository(
                     mapOf(
                         "participants" to updatedParticipants,
                         "ownerId" to newOwner,
-                        "filaments" to updatedFilaments
+                        "filaments" to updatedFilaments,
+                        "lastModifiedAt" to Date().time
                     )
                 ).await()
             }
@@ -208,7 +226,12 @@ class SessionRepository(
 
             firestore.collection("sessions")
                 .document(sessionId)
-                .update("filaments", updatedFilaments)
+                .update(
+                    mapOf(
+                        "filaments" to updatedFilaments,
+                        "lastModifiedAt" to Date().time
+                    )
+                )
                 .await()
 
             Result.success(Unit)
@@ -216,6 +239,110 @@ class SessionRepository(
             Result.failure(e)
         }
     }
+
+    // New: update full filament object inside a session using a transaction to avoid races
+    suspend fun updateFilamentInSession(sessionId: String, filament: Filament): Result<Unit> {
+        return try {
+            val docRef = firestore.collection("sessions").document(sessionId)
+
+            firestore.runTransaction { transaction ->
+                val snapshot = transaction.get(docRef)
+                val filamentsList = snapshot.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+
+                val updated = filamentsList.map { existing ->
+                    if (existing["id"] == filament.id) {
+                        // build map preserving any unknown keys not present in Filament model
+                        val newMap = mutableMapOf<String, Any>()
+                        newMap["id"] = filament.id
+                        newMap["type"] = filament.type
+                        newMap["brand"] = filament.brand
+                        newMap["weight"] = filament.weight
+                        newMap["status"] = filament.status
+                        newMap["color"] = filament.colorHex
+                        newMap["expirationDate"] = filament.expirationDate
+                        newMap["activeNfc"] = filament.activeNfc
+                        newMap["note"] = filament.note
+                        newMap["ownerId"] = filament.ownerId
+                        newMap["originalWeight"] = filament.originalWeight
+                        newMap
+                    } else {
+                        existing
+                    }
+                }
+
+                transaction.update(docRef, "filaments", updated)
+                transaction.update(docRef, "lastModifiedAt", Date().time)
+            }.await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateSessionName(sessionId: String, newName: String): Result<Unit> {
+        return try {
+            firestore.collection("sessions")
+                .document(sessionId)
+                .update(mapOf(
+                    "name" to newName,
+                    "updatedAt" to Date().time
+                ))
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun removeParticipantFromSession(sessionId: String, participantId: String): Result<Unit> {
+        return try {
+            val sessionSnapshot = firestore.collection("sessions")
+                .document(sessionId)
+                .get()
+                .await()
+
+            val session = sessionSnapshot.toObject(Session::class.java)
+                ?: return Result.failure(Exception("Session not found"))
+
+            // Remove participant from participants list
+            val updatedParticipants = session.participants.filter { it != participantId }
+
+            // If session becomes empty, delete it
+            if (updatedParticipants.isEmpty()) {
+                firestore.collection("sessions").document(sessionId).delete().await()
+            } else {
+                // If removed participant is owner, transfer ownership to first remaining participant
+                val newOwner = if (session.ownerId == participantId) updatedParticipants.first() else session.ownerId
+
+                // Remove participant's filaments from session
+                val filamentsList = sessionSnapshot.get("filaments") as? List<Map<String, Any>> ?: emptyList()
+                val updatedFilaments = filamentsList.filter { (it["ownerId"] as? String) != participantId }
+
+                firestore.collection("sessions").document(sessionId).update(
+                    mapOf(
+                        "participants" to updatedParticipants,
+                        "ownerId" to newOwner,
+                        "filaments" to updatedFilaments,
+                        "updatedAt" to Date().time
+                    )
+                ).await()
+            }
+
+            // Remove session reference from user's sessions
+            firestore.collection("users")
+                .document(participantId)
+                .collection("sessions")
+                .document(sessionId)
+                .delete()
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 
     private fun generateAccessCode(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

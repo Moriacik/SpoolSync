@@ -9,6 +9,6 @@ data class Session(
     val accessCode: String = "",
     val participants: List<String> = emptyList(),
     val filaments: List<Map<String, Any>> = emptyList(),
-    val createdAt: Long = 0,
-    val updatedAt: Long = 0
+    val sessionCreatedAt: Long = 0,
+    val lastModifiedAt: Long = 0
 ) : Serializable

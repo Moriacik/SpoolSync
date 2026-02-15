@@ -2,6 +2,8 @@ package com.example.spoolsync.navigation
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,6 +23,7 @@ import com.example.spoolsync.ui.screens.FilamentNfcScreenMode
 import com.example.spoolsync.ui.screens.OcrScreen
 import com.example.spoolsync.ui.screens.PrintScreen
 import com.example.spoolsync.ui.screens.SessionDetailScreen
+import com.example.spoolsync.ui.screens.SessionSettingsScreen
 import com.example.spoolsync.ui.screens.SessionsScreen
 import com.example.spoolsync.ui.screens.SettingsScreen
 import com.example.spoolsync.ui.screens.StatisticsScreen
@@ -28,9 +31,9 @@ import com.example.spoolsync.ui.viewModels.NfcViewModel
 import com.example.spoolsync.ui.viewModels.OcrViewModel
 import com.example.spoolsync.ui.viewModels.SessionsViewModel
 import com.example.spoolsync.ui.viewModels.SettingsViewModel
+import com.example.spoolsync.nfc.NfcTagManager
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlin.text.get
 
 /**
  * Hlavná navigačná funkcia aplikácie SpoolSync.
@@ -112,6 +115,39 @@ fun SpoolSyncApp(startDestination: String) {
                 mode = FilamentFormMode.VIEW,
                 initialFilament = filamentViewModel.filaments.find { it.id == filamentId },
                 filamentViewModel = filamentViewModel
+            )
+        }
+
+        // Session-specific filament view/edit
+        composable(
+            "sessionFilamentView/{sessionId}/{filamentId}",
+            arguments = listOf(
+                navArgument("sessionId") { type = NavType.StringType },
+                navArgument("filamentId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+            val filamentId = backStackEntry.arguments?.getString("filamentId") ?: ""
+            FilamentFormScreen(
+                navController = navController,
+                mode = FilamentFormMode.VIEW,
+                initialFilament = null,
+                filamentViewModel = filamentViewModel,
+                sessionId = sessionId,
+                sessionsViewModel = sessionsViewModel,
+                filamentId = filamentId
+            )
+        }
+
+        // Session settings
+        composable("sessionSettings/{sessionId}",
+            arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val sessionId = backStackEntry.arguments?.getString("sessionId") ?: ""
+            SessionSettingsScreen(
+                navController = navController,
+                sessionId = sessionId,
+                sessionsViewModel = sessionsViewModel
             )
         }
 

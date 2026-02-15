@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
@@ -88,7 +89,9 @@ fun PrintScreen(
 ) {
     val context = LocalContext.current
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    var scannedWeightState by remember { mutableStateOf(scannedWeight) }
+    // Extract only numbers from scannedWeight (remove text like "g", "gramov", etc.)
+    val cleanedScannedWeight = scannedWeight.filter { it.isDigit() }.takeIf { it.isNotEmpty() } ?: "0"
+    var scannedWeightState by remember { mutableStateOf(cleanedScannedWeight) }
     val scannedRoundedWeight = scannedWeightState.toFloatOrNull()?.toInt() ?: 0
     val newWeight = filament?.weight?.minus(scannedRoundedWeight) ?: 0
     val error1 = stringResource(R.string.negative_weight)
@@ -262,8 +265,35 @@ fun PrintScreen(
                     )
                     Text(
                         text = "$newWeight g",
-                        modifier = Modifier.padding(end = 20.dp)
+                        modifier = Modifier.padding(end = 20.dp),
+                        color = if (newWeight < 0) colorResource(R.color.red) else colorResource(R.color.black)
                     )
+                }
+
+                // Warning if not enough filament
+                if (newWeight < 0) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                            .background(colorResource(R.color.red), shape = RoundedCornerShape(8.dp))
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_info),
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Not enough filament to print this model",
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
 
                 Row(
@@ -302,7 +332,11 @@ fun PrintScreen(
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),
+                        enabled = newWeight >= 0,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = SpoolSyncTheme.colors.lightGrayGray,
+                            disabledContainerColor = colorResource(R.color.gray)
+                        ),
                         modifier = Modifier
                             .padding(top = 16.dp)
                             .width(250.dp)

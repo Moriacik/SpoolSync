@@ -1,5 +1,6 @@
 package com.example.spoolsync.ui.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,6 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,6 +54,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toArgb
@@ -72,7 +77,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.spoolsync.data.model.Filament
-import com.example.spoolsync.ui.screens.FilamentItem
 import com.example.spoolsync.ui.theme.SpoolSyncTheme
 
 /**
@@ -104,7 +108,8 @@ fun <T> FormWithIcon(
     inputType: InputType,
     options: List<String> = emptyList(),
     navController: NavController,
-    isEditable: Boolean = true
+    isEditable: Boolean = true,
+    sessionId: String? = null // optional session scope for navigation
 ) {
     Row(
         modifier = Modifier
@@ -169,7 +174,12 @@ fun <T> FormWithIcon(
                             )
                             Button(
                                 onClick = {
-                                    navController.navigate("filamentNfcUpdate/${id}")
+                                    // If called from a session context, navigate with sessionId so NFC screen can update session filament
+                                    if (!sessionId.isNullOrEmpty()) {
+                                        navController.navigate("filamentNfcUpdate/${sessionId}/${id}")
+                                    } else {
+                                        navController.navigate("filamentNfcUpdate/${id}")
+                                    }
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = SpoolSyncTheme.colors.lightGrayGray),
                                 modifier = Modifier
@@ -690,11 +700,12 @@ fun SessionDialog(
 fun FilamentList(
     filaments: List<Filament>,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFilamentClick: (Filament) -> Unit = { navController.navigate("filamentView/${it.id}") }
 ) {
     LazyColumn(modifier) {
         items(filaments) { filament ->
-            FilamentItem(filament, navController)
+            FilamentItem(filament, navController, onFilamentClick)
             HorizontalDivider(color = SpoolSyncTheme.colors.lightGrayDarkGray)
         }
     }
@@ -702,12 +713,12 @@ fun FilamentList(
 
 
 @Composable
-fun FilamentItem(filament: Filament, navController: NavController) {
+fun FilamentItem(filament: Filament, navController: NavController, onFilamentClick: (Filament) -> Unit = { navController.navigate("filamentView/${it.id}") }) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .clickable { navController.navigate("filamentView/${filament.id}") },
+            .clickable { onFilamentClick(filament) },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -893,4 +904,140 @@ fun ShareFilamentDialog(
         containerColor = SpoolSyncTheme.colors.lighterGrayDarkerGray,
         textContentColor = colorResource(R.color.white)
     )
+}
+
+/**
+ * Jednotný komponent pre preview kamery s dekoratívnym rámom.
+ * Používa sa pre OCR skenovanie a QR kód skenovanie.
+ *
+ * @param modifier Modifier pre komponent
+ * @param content Obsah (kamera preview, Canvas, atď.)
+ * @param showDecorativeFrame Ak true, zobrazí dekoratívne rohové čiary
+ */
+@Composable
+fun CameraFrameOverlay(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+    showDecorativeFrame: Boolean = true
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(16.dp))
+            .background(SpoolSyncTheme.colors.darkGrayGray, RoundedCornerShape(16.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        // Obsah kamery
+        content()
+
+        // Dekoratívny rám v rohoch
+        if (showDecorativeFrame) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp, 60.dp)
+                    .background(Color.Transparent)
+                    .align(Alignment.Center)
+            ) {
+                DecorativeCornerDividers(
+                    boxWidth = 100.dp,
+                    boxHeight = 60.dp,
+                    dividerLength = 20.dp,
+                    dividerThickness = 3.dp,
+                    dividerColor = SpoolSyncTheme.colors.lightGrayWhite
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Jednotný komponent pre QR kód scanner s crosshair overlay.
+ * Kombinuje kameraPreview s vizuálnym feedbackom.
+ *
+ * @param modifier Modifier pre komponent
+ * @param content Obsah (kamera preview)
+ */
+@Composable
+fun QRScannerFrame(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .background(SpoolSyncTheme.colors.darkGrayGray, RoundedCornerShape(16.dp))
+            .border(2.dp, SpoolSyncTheme.colors.lightGrayWhite, RoundedCornerShape(16.dp))
+            .clipToBounds(),
+        contentAlignment = Alignment.Center
+    ) {
+        // Obsah kamery
+        content()
+
+        // Crosshair overlay
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val centerX = size.width / 2
+            val centerY = size.height / 2
+            val crossSize = 80.dp.toPx()
+            val cornerSize = 40.dp.toPx()
+            val lineWidth = 3.dp.toPx()
+
+            val color = Color.Green
+
+            // Top-left corner
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX - crossSize, centerY - crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX - crossSize + cornerSize, centerY - crossSize),
+                strokeWidth = lineWidth
+            )
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX - crossSize, centerY - crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX - crossSize, centerY - crossSize + cornerSize),
+                strokeWidth = lineWidth
+            )
+
+            // Top-right corner
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX + crossSize, centerY - crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX + crossSize - cornerSize, centerY - crossSize),
+                strokeWidth = lineWidth
+            )
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX + crossSize, centerY - crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX + crossSize, centerY - crossSize + cornerSize),
+                strokeWidth = lineWidth
+            )
+
+            // Bottom-left corner
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX - crossSize, centerY + crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX - crossSize + cornerSize, centerY + crossSize),
+                strokeWidth = lineWidth
+            )
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX - crossSize, centerY + crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX - crossSize, centerY + crossSize - cornerSize),
+                strokeWidth = lineWidth
+            )
+
+            // Bottom-right corner
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX + crossSize, centerY + crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX + crossSize - cornerSize, centerY + crossSize),
+                strokeWidth = lineWidth
+            )
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(centerX + crossSize, centerY + crossSize),
+                end = androidx.compose.ui.geometry.Offset(centerX + crossSize, centerY + crossSize - cornerSize),
+                strokeWidth = lineWidth
+            )
+        }
+    }
 }

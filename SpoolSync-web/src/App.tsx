@@ -1,54 +1,93 @@
 import { useEffect, useState } from 'react'
+import { signInAnonymously } from 'firebase/auth'
+import { auth } from './config/firebase'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { LoginScreen } from './components/LoginScreen'
+import { StatisticsPage } from './components/StatisticsPage'
 import './App.css'
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+function AppContent() {
+  const [androidUserId, setAndroidUserId] = useState<string | null>(null)
+  const [firebaseReady, setFirebaseReady] = useState(false)
+  const navigate = useNavigate()
 
+  // Initialize Firebase anonymous auth
   useEffect(() => {
-    // Check if user is already authenticated
-    const storedUserId = localStorage.getItem('userId')
-    const sessionId = localStorage.getItem('sessionId')
-    
-    if (storedUserId && sessionId) {
-      setIsAuthenticated(true)
-      setUserId(storedUserId)
+    const initAuth = async () => {
+      try {
+        if (!auth.currentUser) {
+          await signInAnonymously(auth)
+          console.log('Web app authenticated anonymously')
+        }
+        setFirebaseReady(true)
+      } catch (error) {
+        console.error('Anonymous auth failed:', error)
+        setFirebaseReady(true)
+      }
     }
+
+    initAuth()
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem('userId')
-    localStorage.removeItem('sessionId')
-    setIsAuthenticated(false)
-    setUserId(null)
+  // Check for existing session and redirect
+  useEffect(() => {
+    if (!firebaseReady) return;
+    
+    const storedAndroidUserId = localStorage.getItem('androidUserId')
+    
+    if (storedAndroidUserId) {
+      setAndroidUserId(storedAndroidUserId)
+      // Redirect to stats page if already authenticated and on login page
+      navigate(`/stats/${storedAndroidUserId}`, { replace: true })
+    } else {
+      // Redirect to login if not authenticated
+      navigate('/login', { replace: true })
+    }
+  }, [firebaseReady, navigate])
+
+  const handleAuthSuccess = (newAndroidUserId: string) => {
+    console.log('Auth success, Android user:', newAndroidUserId);
+    setAndroidUserId(newAndroidUserId)
+    localStorage.setItem('androidUserId', newAndroidUserId)
+    navigate(`/stats/${newAndroidUserId}`, { replace: true })
   }
 
-  if (isAuthenticated && userId) {
+  const handleLogout = () => {
+    console.log('🚪 Logout clicked');
+    localStorage.removeItem('androidUserId')
+    localStorage.removeItem('sessionId')
+    // Clear any cached data
+    sessionStorage.clear()
+    setAndroidUserId(null)
+    console.log('Cleared localStorage, sessionStorage and state, redirecting to login...');
+    navigate('/login', { replace: true })
+  }
+
+  if (!firebaseReady) {
     return (
-      <div className="app-container">
-        <div className="dashboard-container">
-          <header className="dashboard-header">
-            <h1>SpoolSync - Štatistiky</h1>
-            <button onClick={handleLogout} className="btn-logout">
-              Odhlásiť sa
-            </button>
-          </header>
-          <div className="stats-container">
-            <div className="stat-card">
-              <h2>Informácie o účte</h2>
-              <p>User ID: <strong>{userId}</strong></p>
-              <div className="placeholder">
-                <p>Štatistiky budú zobrazené tu...</p>
-              </div>
-            </div>
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#667eea' }}>
+        <div style={{ color: 'white', textAlign: 'center' }}>
+          <p>Inicializujem aplikáciu...</p>
         </div>
       </div>
     )
   }
 
-  return <LoginScreen />
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginScreen onAuthSuccess={handleAuthSuccess} />} />
+      <Route path="/stats/:userId" element={<StatisticsPage onLogout={handleLogout} />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  )
 }
 
 export default App

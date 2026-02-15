@@ -17,6 +17,7 @@
     <string name="error5">Registration failed.</string>
     <string name="to_register">"Don't have an account? Sign up."</string>
     <string name="to_login">"Back to Login."</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
 
     <!-- Filament Form strings -->
     <string name="edit">Edit</string>
@@ -116,6 +117,13 @@
     <string name="access_code">Access code</string>
     <string name="session_name">Session name</string>
     <string name="open_sessions">Open sessions</string>
+    <string name="leave_session">Leave Session</string>
+    <string name="participants">Participants</string>
+    <string name="owner">Owner</string>
+    <string name="member">Member</string>
+    <string name="no_participants">No participants</string>
+    <string name="remove">Remove</string>
+    <string name="save">Save</string>
 
     <!-- Custom components strings -->
     <string name="share_filament">Share filament: %s</string>
