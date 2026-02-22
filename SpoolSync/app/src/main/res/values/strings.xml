@@ -19,6 +19,13 @@
     <string name="to_login">"Back to Login."</string>
     <string name="sign_in_with_google">Sign in with Google</string>
 
+    <!-- Email Verification strings -->
+    <string name="verify_email_title">Verify Your Email</string>
+    <string name="verify_email_description">We\'ve sent a verification link to %s. Click the link in your email to verify your account.</string>
+    <string name="verify_email_check">Check Verification Status</string>
+    <string name="verify_email_resend">Resend Verification Email</string>
+    <string name="logout">Logout</string>
+
     <!-- Filament Form strings -->
     <string name="edit">Edit</string>
     <string name="photo">Photo</string>

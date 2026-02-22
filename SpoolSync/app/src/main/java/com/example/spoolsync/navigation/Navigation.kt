@@ -18,6 +18,7 @@ import com.example.spoolsync.ui.screens.FilamentFormScreen
 import com.example.spoolsync.ui.screens.FilamentsScreen
 import com.example.spoolsync.ui.screens.LoginScreen
 import com.example.spoolsync.ui.screens.RegisterScreen
+import com.example.spoolsync.ui.screens.VerificationScreen
 import com.example.spoolsync.ui.screens.FilamentNfcScreen
 import com.example.spoolsync.ui.screens.FilamentNfcScreenMode
 import com.example.spoolsync.ui.screens.OcrScreen
@@ -64,6 +65,14 @@ fun SpoolSyncApp(startDestination: String) {
         // Registrácia
         composable("register") {
             RegisterScreen(
+                navController = navController,
+                authViewModel = authViewModel
+            )
+        }
+
+        // Overenie emailu
+        composable("verification") {
+            VerificationScreen(
                 navController = navController,
                 authViewModel = authViewModel
             )

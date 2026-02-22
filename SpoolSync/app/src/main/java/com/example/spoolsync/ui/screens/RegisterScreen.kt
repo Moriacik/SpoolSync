@@ -162,10 +162,15 @@ fun RegisterScreen(
                             email = email,
                             password = password,
                             onSuccess = {
-                                isLoading = false
-                                navController.popBackStack()
-                                navController.navigate("filaments") {
-                                    popUpTo("register") { inclusive = true }
+                                // Odoslanie verifikačného emailu
+                                authViewModel.sendVerificationEmail { success, error ->
+                                    isLoading = false
+                                    // Navigácia na verification screen bez ohľadu na úspech
+                                    // (email sa môže poslať s oneskorením)
+                                    navController.popBackStack()
+                                    navController.navigate("verification") {
+                                        popUpTo("register") { inclusive = true }
+                                    }
                                 }
                             },
                             onError = { error ->

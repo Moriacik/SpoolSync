@@ -182,8 +182,16 @@ fun LoginScreen(
                         if (!success) {
                             errorMessage = errorMsg ?: error2
                         } else {
-                            navController.navigate("filaments") {
-                                popUpTo("login") { inclusive = true }
+                            // Skontroluj či je email overený
+                            if (authViewModel.isEmailVerified()) {
+                                navController.navigate("filaments") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            } else {
+                                // Email nie je overený, naviguj na verification screen
+                                navController.navigate("verification") {
+                                    popUpTo("login") { inclusive = true }
+                                }
                             }
                         }
                     }

@@ -22,8 +22,13 @@ import kotlin.collections.remove
 class AuthViewModel(
     application: Application
 ) : AndroidViewModel(application) {
-    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    internal val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+
+    /**
+     * Getter na email aktuálneho používateľa
+     */
+    fun getCurrentUserEmail(): String = auth.currentUser?.email ?: ""
 
     /**
      * Kontrola, či je používateľ úspešne prihlásený.
@@ -333,5 +338,87 @@ class AuthViewModel(
      */
     fun checkAuthStatus(): Boolean {
         return auth.currentUser != null
+    }
+
+    /**
+     * Odoslanie verifikačného emailu aktuálnemu používateľovi.
+     * Musia byť splnené dve podmienky: používateľ musí byť prihlásený a email nemusí byť overený.
+     *
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom (success, error).
+     */
+    fun sendVerificationEmail(callback: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        if (user == null) {
+            callback(false, "Používateľ nie je prihlásený")
+            return
+        }
+
+        if (user.isEmailVerified) {
+            callback(true, null)
+            return
+        }
+
+        user.sendEmailVerification()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("EmailVerification", "Verifikačný email odoslaný: ${user.email}")
+                    callback(true, null)
+                } else {
+                    Log.e("EmailVerification", "Nepodarilo sa odoslať verifikačný email: ${task.exception?.message}")
+                    callback(false, task.exception?.message ?: "Odoslanie emailu zlyhalo")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("EmailVerification", "Chyba pri odosilaní verifikácie: ${exception.message}")
+                callback(false, exception.message ?: "Chyba pri odosilaní emailu")
+            }
+    }
+
+    /**
+     * Preloadovanie aktuálneho používateľa z Firebase Auth.
+     * Toto obnovuje údaje o používateľovi vrátane statusu emailovej verifikácie.
+     *
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom (success, error).
+     */
+    fun reloadUser(callback: (Boolean, String?) -> Unit) {
+        val user = auth.currentUser
+        if (user == null) {
+            callback(false, "Používateľ nie je prihlásený")
+            return
+        }
+
+        user.reload()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("EmailVerification", "Používateľ obnovený. Email overený: ${user.isEmailVerified}")
+                    callback(true, null)
+                } else {
+                    Log.e("EmailVerification", "Nepodarilo sa obnoviť používateľa: ${task.exception?.message}")
+                    callback(false, task.exception?.message ?: "Obnovenie zlyhalo")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("EmailVerification", "Chyba pri obnovení používateľa: ${exception.message}")
+                callback(false, exception.message ?: "Chyba pri obnovení")
+            }
+    }
+
+    /**
+     * Opätovné odoslanie verifikačného emailu.
+     * Môže byť volané viacerými krát, ale je odporúčané implementovať throttling na klientskej strane.
+     *
+     * @param callback Funkcia, ktorá sa zavolá s výsledkom (success, error).
+     */
+    fun resendVerificationEmail(callback: (Boolean, String?) -> Unit) {
+        sendVerificationEmail(callback)
+    }
+
+    /**
+     * Getter na zistenie či je email aktuálneho používateľa overený.
+     *
+     * @return True, ak je email overený, False inak (aj keď user neexistuje).
+     */
+    fun isEmailVerified(): Boolean {
+        return auth.currentUser?.isEmailVerified ?: false
     }
 }

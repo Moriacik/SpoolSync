@@ -46,7 +46,11 @@ class MainActivity : ComponentActivity() {
 
             // Firebase Auth check (has priority over SharedPreferences)
             val currentUser = Firebase.auth.currentUser
-            val startDestination = if (currentUser != null) "filaments" else "login"
+            val startDestination = when {
+                currentUser == null -> "login"
+                currentUser.isEmailVerified -> "filaments"
+                else -> "verification"
+            }
 
             SpoolSyncTheme(useDarkTheme = isDarkMode.value) {
                 Surface {
